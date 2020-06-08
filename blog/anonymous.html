@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - Anonymous: the worst and most common name</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="/blog">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1>Anonymous: the worst and most common name</h1>
+      <p class="timestamp">2020-06-08</p>
+      <p>
+        Think about some of the bad variable names you've encountered in code (yours or someone else's) and the trouble they gave you.
+        You have likely encountered overly generic names, shorthand names (sometimes just one character) and flat out wrong or misleading names.
+        However, one variable name causes more confusion than any other and since you've already read the title you know I'm talking about anonymous: the omission of a name.
+        Let's contrast appropriate and inappropriate uses of anonymous values.
+      </p>
+      <h2>Is the role immediately obvious?</h2>
+      <p>
+        I've noticed in my time of reviewing code that senior developers tend to use much fewer "elegant one-liners" than juniors.
+        That is to say, experienced developers tend to interrupt the flow of functions and expressions to insert variable declarations.
+        The purpose of these variable declarations is to give a name to an intermediate value used in a calculation.
+        By naming intermediate values whose role is not immediately obvious the author makes the code more verbose but also more readable.
+        Specifically, a value whose role is not <strong>immediately obvious</strong> should have a name to ensure good readability.
+        "Immediately obvious" is a subjective term. Let's look at some examples to elucidate the matter.
+      </p>
+      <code>
+<pre>
+function incrementNumber(input) {
+  return input + 1;
+}
+</pre>
+      </code>
+      <p>
+        In this function declaration the value <code>1</code> is anonymous.
+        Let's give it a name.
+      </p>
+      <code>
+<pre>
+var INCREMENT = 1;
+function incrementNumber(input) {
+  return input + INCREMENT;
+}
+</pre>
+      </code>
+      <p>
+        Did we improve the readability of the code?
+        I would argue we did not.
+        We gave a name to a variable whose role was already immediately obvious.
+        We increased verbosity and cluttered the code with unimportant information.
+      </p>
+      <p>
+        Another example.
+      </p>
+      <code>
+<pre>
+function validateId(id) {
+  return /[\da-fA-F]{32}/.test(id);
+};
+</pre>
+      </code>
+      <p>
+        In this function declaration the regular expression <code>/[\da-fA-F]{32}/</code> is anonymous.
+        Let's give it a name.
+      </p>
+      <code>
+<pre>
+var 32_DIGIT_HEXADECIMAL_PATTERN = /[\da-fA-F]{32}/;
+function validateId(id) {
+  return 32_DIGIT_HEXADECIMAL_PATTERN.test(id);
+};
+</pre>
+      </code>
+      <p>
+        Did we improve the readability now?
+        I would argue we did.
+        Even someone fluent in regular expressions is likely faster at reading and understanding the named version.
+        On top of that, the name communicates to the reader the intentions of the author.
+        In the named version it is clear that the author intended the function to validate an id to be a string representation of a hexadecimal number of exactly 32 digits.
+        If the implementation was to be wrong (which is entirely possible in this example since I don't run or validate my example code) it would be much easier for a reader to spot the mistake.
+      </p>
+      <h2>Takeaways</h2>
+      <p>
+        We developers are inherently lazy and when confronted with a value we barely understand we oftentimes think we can <strong>sidestep the issue of naming completely by keeping the value anonymous.</strong>
+        I know I've been guilty of coming up with no descriptive name for a variable so I just left it anonymous.
+        Come code review time my coworker simply assumed I knew what I was doing in that one expression full of anonymous variables and approved the code.
+        In the end my unreadable spaghetti made it to production because I was too unsure to name a variable and my coworker was too unsure to call me out on it.
+        I invite you to be skeptical of every anonymous value you see and ask yourself "Is the role immediately obvious?" whether you're writing or reviewing code.
+        If you're ever wondering whether a value's role is immediately obvious or not, it's likely not.
+        A reader has much less context than the author on a specific piece of code.
+        Err on the side of adding too many names instead of leaving too many variables anonymous.
+      </p>
+      <p>
+        In conclusion "anonymous" is oftentimes the least descriptive name you could give a variable.
+        Unfortunately it is also the easiest name to give.
+      </p>
+    </article>
+  </body>
+</html>

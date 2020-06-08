@@ -1,0 +1,71 @@
+body {
+  background-color: #332826;
+  color: rgba(255, 255, 255, .87);
+  padding: 0 2%;
+  margin-bottom: 200px;
+}
+
+code {
+  font-family: monospace;
+}
+
+code, pre {
+  background-color: #121212;
+}
+
+pre {
+  border-radius: 10px;
+  padding: 24px;
+}
+
+strong {
+  color: rgba(255, 255, 255, 1);
+}
+
+h1 {
+  color: rgba(255, 200, 220, .92);
+}
+
+h2 {
+  color: rgba(255, 200, 220, .92);
+  padding: 0 4px;
+}
+
+p {
+  padding: 0 8px;
+  line-height: 1.5rem;
+}
+
+header {
+  padding: 24px;
+}
+
+header > h1 {
+  font-size: 24px;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+a:hover,:focus {
+  color: #fff;
+}
+
+.username {
+  color: #fff;
+  font-family: monospace;
+}
+
+.timestamp {
+  color: rgba(255, 255, 255, .6);
+  padding: 0 4px;
+  margin-top: -20px;
+  margin-bottom: 20px;
+}
+
+@media only screen and (min-width: 768px) {
+  body {
+    padding: 0 25%;
+  }
+}
