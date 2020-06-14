@@ -7,6 +7,11 @@ body {
 
 code {
   font-family: monospace;
+  white-space: nowrap;
+}
+
+pre > code {
+  white-space: pre;
 }
 
 code, pre {
@@ -16,6 +21,7 @@ code, pre {
 pre {
   border-radius: 10px;
   padding: 24px;
+  white-space: pre;
 }
 
 strong {
@@ -50,6 +56,9 @@ a {
 }
 a:hover,:focus {
   color: #fff;
+}
+p > a {
+  color: rgba(220, 200, 255, .92);
 }
 
 .username {

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - On the expressiveness of truthiness</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="./index.html">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1>On the expressiveness of truthiness</h1>
+      <p class="timestamp">2020-06-14</p>
+      <p>
+        A variable is <strong>truthy</strong> if casting it into a boolean type evaluates to true.
+        Conversely, a variable is <strong>falsy</strong> if it isn't truthy.
+        Javascript developers can use any value as a boolean expressions (like an if condition) because values are implicitly cast into booleans.
+        Relying on this implicit casting may hurt the readability of your code.        
+      </p>
+      <h2>The lint rule</h2>
+      <p>
+        This post was inspired by <a href="https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/strict-boolean-expressions.md">@typescript-eslint/strict-boolean-expressions</a>.
+        The rule is only for TypeScript projects but learnings from it can be applied to javascript code.
+        The rest of this post will go through the various options of the rule and explain with examples how each affects the code you write.
+      </p>
+      <h2>"allowString"</h2>
+      <p>
+        When set to <code>false</code> this option will consider it incorect to use <code>string</code> as a boolean expression.
+      </p>
+      <p>
+        Incorrect code for this option:
+        <code>
+<pre>
+function parseString(str: string) {
+  const parsed: string = str.split(',')[0];
+  if (!parsed) {
+    throw new Error('Parsed value is empty');
+  }
+  return parsed;
+}
+
+</pre>
+        </code>
+        You should instead explicitly state which falsy value you're testing for in the if condition.
+        <code>
+<pre>
+function parseString(str: string) {
+  const parsed: string = str.split(',')[0];
+  if (parsed === '') {
+    throw new Error('Parsed value is empty');
+  }
+  return parsed;
+}
+</pre>
+        </code>
+        As long as your types can be trusted this option makes your code more expressive by reducing the cognitive load of reading and understanding your code.
+        I read <code>!value</code> as "not value" and <code>value !== ''</code> as "value is not empty string".
+        It is considerably faster for me to get the hang of the latter than the former.
+        I concede some people have no such trouble reading code and may prefer the brewity of the falsyness check.
+      </p>
+      <p>
+        This option is <code>true</code> by default because it doesn't touch on any common sources of bugs.
+        I suggest you set it as <code>false</code> in your configuration to enforce better readablitity.
+      </p>
+      <h2>"allowNumber"</h2>
+      <p>
+        When set to <code>false</code> this option will consider it incorrect to use <code>number</code> as a boolean expression.
+      </p>
+      <p>
+        Incorrect code for this option:
+        <code>
+<pre>
+function isEmpty(array: unknown[]) {
+  return !array.length;
+}
+</pre>
+        </code>
+        You should instead explicitly state which falsy value you're testing for.
+        <code>
+<pre>
+function isEmpty(array: unknown[]) {
+  return array.length === 0;
+}
+</pre>
+        </code>
+      </p>
+      <p>
+        I read <code>!value</code> as "not value" and <code>value === 0</code> as "value is zero".
+        Like with strings above I prefer the latter because I find it easier and faster to read.
+      </p>
+      <p>
+        This option is <code>true</code> by default because it doesn't touch on any common sources of bugs.
+        I suggest you set it as <code>false</code> in your configuration to enforce better readablitity.
+      </p>
+      <h2>"allowNullableObject"</h2>
+      <p>
+        When set to <code>false</code> this option will consider it incorrect to use a nullable object like <code>Record&lt;string, unknown&gt; | null | undefined</code> as a boolean expression.
+      </p>
+      <p>
+        Incorrect code for this option:
+        <code>
+<pre>
+function isNullish(object?: Record&lt;string, unknown&gt;) {
+  return !object;
+}
+</pre>
+        </code>
+        You should instead explicitly state which falsy values you're testing for.
+        <code>
+<pre>
+function isNullish(object?: Record&lt;string, unknown&gt;) {
+  return object == null;
+}
+</pre>
+        </code>
+      </p>
+      <p>
+        <code>value == null</code> is more expressive whereas <code>!value</code> is brief.
+        Veteran javascript developers already read <code>!value</code> as a null check and some developers may object to the use of double equals <code>==</code>.
+        If your lint rules prohibit the use of <code>== null</code> you definitely want to allow nullable objects because <code>value === null || value === undefined</code> is just ugly and checking for only one or the other is a common source of bugs.
+      </p>
+      <p>
+        This option is <code>true</code> by default.
+        Even thought I prefer the expressiveness of an explicit null check I suggest you leave this option as <code>true</code> because the benefits are too minor compared to the costs.
+      </p>
+      <h2>"allowNullableString"</h2>
+      <p>
+        When set to <code>false</code> this option will consider it incorrect to use a nullable string like <code>string | null | undefined</code> as a boolean expression.
+      </p>
+      <p>
+        Incorrect code for this option:
+        <code>
+<pre>
+function formatMessage(message?: string) {
+  if (!message) {
+    throw new Error('No message provided');
+  }
+  return `Notice: ${message}`;
+}
+</pre>
+        </code>
+        You should instead explicitly state which falsy values are checked for.
+        <code>
+<pre>
+function formatMessage(message?: string) {
+  if (message == null || message === '') {
+    throw new Error('No message provided');
+  }
+  return `Notice: ${message}`;
+}
+</pre>
+        </code>
+        The latter is more expressive as it communicates the full intent of the author to a reader.
+        The author indeed meant to check for both nullish and empty values.
+      </p>
+      <p>
+        This option touches on a common source of bugs: accidentally taking an empty string <code>''</code> into a code path intended only for nullish values.
+        Here's an example where an empty string as a corner case causes a bug.
+        <code>
+<pre>
+function assertMessageIsDefined(message?: string) {
+  if (!message) {
+    throw new Error('Message is undefined!');
+  }
+}
+</pre>
+        </code>
+      </p>
+      <p>
+        This option is set to <code>false</code> by default.
+        I consider it the most important option and while I wish I could unequivocally tell you to keep it as <code>false</code> it has its flaws.
+      </p>
+      <p>
+        The way I tell fledgling javascript developers to check for string nullishness or emptiness is <code>value != null</code> for non-nullishness, <code>value !== ''</code> for non-emptiness and <code>!!value</code> for both.
+        This option, set to <code>false</code>, forbids the third check and insists on the verbose <code>Boolean(value)</code> or <code>value != null && value !== ''</code> instead.
+        It's just my preference but I wish the option allowed the "not-not" expression.
+        It's a tiny nitpick and as such I still suggest you keep the option set to <code>false</code> and just deal with the verbosity because this option prevents real bugs.
+      </p>
+      <p>
+        I'm aware I should just bite the bullet and open a PR for allowing <code>!!</code> myself.
+        Trouble is I find it easier and considerable more fun complaining about code than I do writing it.
+        Maybe some day.
+      </p>
+      <h2>"allowNullableBoolean"</h2>
+      <p>
+        When set to <code>false</code> this option will consider it incorrect to use a nullable boolean like <code>boolean | null | undefined</code> as a boolean expression.
+      </p>
+      <p>
+        Incorrect code for this option:
+        <code>
+<pre>
+function formatInfo(information: string, concatenateWarning?: boolean) {
+  if (concatenateWarning) {
+    return information + ' citation needed';
+  }
+  return information;
+}
+</pre>
+        </code>
+        You should instead explicitly state which boolean value should override <code>undefined</code>.
+        <code>
+<pre>
+function formatInfo(information: string, concatenateWarning = false) {
+  if (concatenateWarning) {
+   return information + ' citation needed';
+  }
+  return information;
+}
+</pre>
+        </code>
+      </p>
+      <p>
+        I showed you a narrow example of what the option does because I wanted to first show an example where it adds to clarity.
+        I would argue the above example is the most common scenario in which this option would come into play.
+        However, each software project is different and yours may have some cases where the option is unhelpful.
+        Let me give you an example.
+        <code>
+<pre>
+function formatInfo(information: string, concatenateWarning: boolean | null) {
+  if (concatenateWarning) {
+    return information + ' citation needed';
+  }
+  return information;
+}
+</pre>
+        </code>
+        The lint rule would insist you wrap the if condition in an explicit <code>Boolean(concatenateWarning)</code> type cast.
+        That is maybe tolerable if it happens once or twice in a project but lint rules should never get in the way of good code style.
+      </p>
+      <p>
+        The option <code>allowNullableBoolean</code> set to <code>false</code> can have some benefits in making sure you are checking the right condition.
+        I think the benefit is far outweighted by the drawback of having to explicitly cast optional booleans which may expose your application to fragility because only <code>undefined</code> is replaced by a default, not <code>null</code>.
+      </p>
+      <p>
+        This option is <code>false</code> by default.
+        I suggest you set it to <code>true</code> instead.
+        I feel it both enforces good practices as well as limits the expressiveness of your contributors.
+        There are realistic cases in which developers may need to work around this option (like <code>boolean | null</code>).
+        Hence, it gets a thumbs down from me.
+      </p>
+      <h2>"allowNullableNumber"</h2>
+      <p>
+        When set to <code>false</code> this option will consider it incorrect to use a nullable number like <code>number | null | undefined</code> as a boolean expression.
+      </p>
+      <p>
+        Incorrect code for this option:
+        <code>
+<pre>
+function formatArray(array?: string[]) {
+  const numberOfElements = array?.length;
+  if (!numberOfElements) {
+    return 'No elements';
+  }
+  return array.join(', ');
+}
+</pre>
+        </code>
+        You should instead explicitly check for the expected falsy values.
+        <code>
+<pre>
+function formatArray(array?: string[]) {
+  const numberOfElements = array == null ? 0 : array.length;
+  if (numberOfElements === 0) {
+    return 'No elements';
+  }
+  return array.join(', ');
+}
+</pre>
+        </code>
+        The latter version is more verbose, sure, but it importantly communicates more of the author's intent.
+        The latter version clearly communicates the author had considered both the case of a nullish value and an empty value.
+        The former version leaves open the possibility that there was supposed to be handling for an <code>undefined</code> value and the author just forgot to write it.
+      </p>
+      <p>
+        This option is <code>false</code> by default because it touches on a common source of bugs: accidentally taking a zero into a code path intended only for nullish values.
+        I suggest you keep it as <code>false</code> to prevent those bugs.
+      </p>
+      <h2>"allowAny"</h2>
+      <p>
+        Ah, yes. The most controversial of all.
+        Whether or not you want to enable this option depends on the existing internal quality enforcements you have in your project.
+      </p>
+      <p>
+        This option is <code>false</code> by default.
+        I suggest you set it to <code>true</code> instead.
+        Most of the time the <code>any</code> type is used when a developer cannot be bothered to type a certain expression or if the expression in question suffers from some other incorrect type definitions.
+        To compound the cascade of woe further with a linter rule seems superfluous to me.
+        However, if you already have rules enabled to discourage the type <code>any</code> like <code>no-explicit-any</code> then this option set to <code>false</code> may be a useful addition.
+      </p>
+      <h2>Tautologies</h2>
+      <p>
+        You may have noticed there is no counterpart option <code>allowObject</code> to <code>allowNullableObject</code>.
+        It's missing because non-nullable objects as boolean expressions are degenerate just like the literals <code>null</code> and <code>true</code>.
+        Using them as boolean expressions means you are surely doing something wrong.
+        Either the type of your value is wrong or some branch is never visited.
+        The lint rule will consider any instance of a degenerate boolean expression as incorrect and there is no option to turn this feature off.
+        Degenerate boolean expressions indicate some mistake in your code that you really should take care of.
+      </p>
+      <p>
+        Degenerate boolean expressions most often crop up as a result of defensive coding.
+        An author expects an input to be an object but cannot trust the input so he includes a null check.
+        The TypeScript compiler won't complain so the change may make it to version control.
+        I've seen this particular class of mistake multiple times during code review.
+        Each time I've given the same advice: either change the type to include a nullish value or remove the check completely.
+        Future developers stumbling upon these mistakes will have no way of knowing which fix is correct.
+        It's important to catch these mistakes early, preferably with a linter as soon as they're typed.
+      </p>
+      <h2>My preference</h2>
+      <p>
+        My preferred setup for the lint rule in <code>.eslintrc</code> is
+        <code>
+<pre>
+"@typescript-eslint/strict-boolean-expressions": [
+  "error",
+  {
+    "allowString": false,
+    "allowNumber": false,
+    "allowNullableObject": true,
+    "allowNullableBoolean": true,
+    "allowNullableString": false,
+    "allowNullableNumber": false,
+    "allowAny": true
+  }
+]
+</pre>
+        </code>
+      </p>
+      <p>
+        You may notice my preferred options look nothing like the defaults of the lint rule.
+        Only two out of my seven options line up with the defaults.
+        The defaults of the lint rule are mostly designed to catch errors in boolean expressions.
+        I am more concerned with enforcing a readable coding style in a software project.
+        Setting <code>allowString</code> and <code>allowNumber</code> to <code>false</code> does nothing to prevent bugs.
+        I just like them because they improve readablitity in my opinion.
+      </p>
+      <p>
+        Allowing incomprehensible boolean expressions early on in a project will result in unmaintainable legacy code that proves resistant to change when new contributors struggle to understand the intent of old if conditions.
+      </p>
+      <p>
+        If you maintain a TypeScript project I highly recommend adding the lint rule.
+        Be warned, though.
+        You may find hundreds of violations in an existing project and there is no easy <code>--fix</code>.
+        I found 530 in a project I tried to enforce the rule on.
+        Ask your technical lead for permission before you spend time fixing hundreds of style errors.
+        If you are the technical lead keep in mind the sooner you enforce the rule the less violations you have to fix when you eventually do.
+      </p>
+    </article>
+  </body>
+</html>
