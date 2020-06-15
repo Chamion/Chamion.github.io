@@ -16,7 +16,7 @@
       </h1>
     </header>
     <article>
-      <h1>Anonymous: the worst and most common name</h1>
+      <h1 id="Anonymous-the-worst-and-most-common-name">Anonymous: the worst and most common name</h1>
       <time datetime="2020-06-08">2020-06-08</time>
       <p>
         Think about some of the bad variable names you've encountered in code (yours or someone else's) and the trouble they gave you.
@@ -24,7 +24,7 @@
         However, one variable name causes more confusion than any other and since you've already read the title you know I'm talking about anonymous: the omission of a name.
         Let's contrast appropriate and inappropriate uses of anonymous values.
       </p>
-      <h2>Is the role immediately obvious?</h2>
+      <h2 id="Is-the-role-immediately-obvious">Is the role immediately obvious?</h2>
       <p>
         I've noticed in my time of reviewing code that senior developers tend to use much fewer "elegant one-liners" than juniors.
         That is to say, experienced developers tend to interrupt the flow of functions and expressions to insert variable declarations.
@@ -88,7 +88,7 @@ function validateId(id) {
         In the named version it is clear that the author intended the function to validate an id to be a string representation of a hexadecimal number of exactly 32 digits.
         If the implementation was to be wrong (which is entirely possible in this example since I don't run or validate my example code) it would be much easier for a reader to spot the mistake.
       </p>
-      <h2>Takeaways</h2>
+      <h2 id="Takeaways">Takeaways</h2>
       <p>
         We developers are inherently lazy and when confronted with a value we barely understand we oftentimes think we can <strong>sidestep the issue of naming completely by keeping the value anonymous.</strong>
         I know I've been guilty of coming up with no descriptive name for a variable so I just left it anonymous.

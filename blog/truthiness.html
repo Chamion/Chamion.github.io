@@ -16,7 +16,7 @@
       </h1>
     </header>
     <article>
-      <h1>On the expressiveness of truthiness</h1>
+      <h1 id="On-the-expressiveness-of-truthiness">On the expressiveness of truthiness</h1>
       <time datetime="2020-06-14">2020-06-14</time>
       <p>
         A variable is <strong>truthy</strong> if casting it into a boolean type evaluates to true.
@@ -24,13 +24,13 @@
         Javascript developers can use any value as a boolean expressions (like an if condition) because values are implicitly cast into booleans.
         Relying on this implicit casting may hurt the readability of your code.        
       </p>
-      <h2>The lint rule</h2>
+      <h2 id="The-lint-rule">The lint rule</h2>
       <p>
         This post was inspired by <a href="https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/strict-boolean-expressions.md">@typescript-eslint/strict-boolean-expressions</a>.
         The rule is only for TypeScript projects but learnings from it can be applied to javascript code.
         The rest of this post will go through the various options of the rule and explain with examples how each affects the code you write.
       </p>
-      <h2>"allowString"</h2>
+      <h2 id="allowString">"allowString"</h2>
       <p>
         When set to <code>false</code> this option will consider it incorect to use <code>string</code> as a boolean expression.
       </p>
@@ -69,7 +69,7 @@ function parseString(str: string) {
         This option is <code>true</code> by default because it doesn't touch on any common sources of bugs.
         I suggest you set it as <code>false</code> in your configuration to enforce better readablitity.
       </p>
-      <h2>"allowNumber"</h2>
+      <h2 id="allowNumber">"allowNumber"</h2>
       <p>
         When set to <code>false</code> this option will consider it incorrect to use <code>number</code> as a boolean expression.
       </p>
@@ -99,7 +99,7 @@ function isEmpty(array: unknown[]) {
         This option is <code>true</code> by default because it doesn't touch on any common sources of bugs.
         I suggest you set it as <code>false</code> in your configuration to enforce better readablitity.
       </p>
-      <h2>"allowNullableObject"</h2>
+      <h2 id="allowNullableObject">"allowNullableObject"</h2>
       <p>
         When set to <code>false</code> this option will consider it incorrect to use a nullable object like <code>Record&lt;string, unknown&gt; | null | undefined</code> as a boolean expression.
       </p>
@@ -130,7 +130,7 @@ function isNullish(object?: Record&lt;string, unknown&gt;) {
         This option is <code>true</code> by default.
         Even thought I prefer the expressiveness of an explicit null check I suggest you leave this option as <code>true</code> because the benefits are too minor compared to the costs.
       </p>
-      <h2>"allowNullableString"</h2>
+      <h2 id="allowNullableString">"allowNullableString"</h2>
       <p>
         When set to <code>false</code> this option will consider it incorrect to use a nullable string like <code>string | null | undefined</code> as a boolean expression.
       </p>
@@ -188,7 +188,7 @@ function assertMessageIsDefined(message?: string) {
         Trouble is I find it easier and considerable more fun complaining about code than I do writing it.
         Maybe some day.
       </p>
-      <h2>"allowNullableBoolean"</h2>
+      <h2 id="allowNullableBoolean">"allowNullableBoolean"</h2>
       <p>
         When set to <code>false</code> this option will consider it incorrect to use a nullable boolean like <code>boolean | null | undefined</code> as a boolean expression.
       </p>
@@ -245,7 +245,7 @@ function formatInfo(information: string, concatenateWarning: boolean | null) {
         There are realistic cases in which developers may need to work around this option (like <code>boolean | null</code>).
         Hence, it gets a thumbs down from me.
       </p>
-      <h2>"allowNullableNumber"</h2>
+      <h2 id="allowNullableNumber">"allowNullableNumber"</h2>
       <p>
         When set to <code>false</code> this option will consider it incorrect to use a nullable number like <code>number | null | undefined</code> as a boolean expression.
       </p>
@@ -282,7 +282,7 @@ function formatArray(array?: string[]) {
         This option is <code>false</code> by default because it touches on a common source of bugs: accidentally taking a zero into a code path intended only for nullish values.
         I suggest you keep it as <code>false</code> to prevent those bugs.
       </p>
-      <h2>"allowAny"</h2>
+      <h2 id="allowAny">"allowAny"</h2>
       <p>
         Ah, yes. The most controversial of all.
         Whether or not you want to enable this option depends on the existing internal quality enforcements you have in your project.
@@ -294,7 +294,7 @@ function formatArray(array?: string[]) {
         To compound the cascade of woe further with a linter rule seems superfluous to me.
         However, if you already have rules enabled to discourage the type <code>any</code> like <code>no-explicit-any</code> then this option set to <code>false</code> may be a useful addition.
       </p>
-      <h2>Tautologies</h2>
+      <h2 id="Tautologies">Tautologies</h2>
       <p>
         You may have noticed there is no counterpart option <code>allowObject</code> to <code>allowNullableObject</code>.
         It's missing because non-nullable objects as boolean expressions are degenerate just like the literals <code>null</code> and <code>true</code>.
@@ -312,7 +312,7 @@ function formatArray(array?: string[]) {
         Future developers stumbling upon these mistakes will have no way of knowing which fix is correct.
         It's important to catch these mistakes early, preferably with a linter as soon as they're typed.
       </p>
-      <h2>My preference</h2>
+      <h2 id="My-preference">My preference</h2>
       <p>
         My preferred setup for the lint rule in <code>.eslintrc</code> is
         <code>
