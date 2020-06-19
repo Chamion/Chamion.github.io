@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - Consistent referential identity</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="./index.html">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1 id="Consistent-referential-identity">Consistent referential identity</h1>
+      <time datetime="2020-06-19">2020-06-19</time>
+      <p>
+        React hooks rely on identity equality to determine whether deps have changed or not.
+        A function will gain a new referential identity each time it is regenerated.
+        If a function is defined inline in a component, using it in deps will always have those deps change even if they are functionally equivalent.
+      </p>
+      <h2 id="Using-callbacks">Using callbacks</h2>
+      <p>
+        It's admittedly convenient to write a function inline.
+      </p>
+      <code>
+<pre>
+return &lt;CustomButton onClick={() => setEnabled(true)}&gt;Enable&lt;/CustomButton&gt;;
+</pre>
+      </code>
+      <p>
+        The inline lambda <code>onClick</code> will have <code>CustomButton</code> rerender every time even if it has memoization.
+        Not only that, <code>CustomButton</code> will recalculate any of its callbacks that have <code>onClick</code> as a dependency.
+        If any of its children use those callbacks, they too rerender and so on.
+        Let's prevent the cascade of memoization failures with a <code>useCallback</code>.
+      </p>
+      <code>
+<pre>
+const handleClick = useCallback(() => setEnabled(true), [setEnabled]);
+return &lt;CustomButton onClick={handleClick}&gt;Enable&lt;/CustomButton&gt;;
+</pre>
+      </code>
+      <p>
+        Now the referential identity of <code>onClick</code> will be consistent.
+      </p>
+      <p>
+        Callbacks are special props in that their referential identity carries information that cannot be inferred by the child component.
+        Objects and arrays can be compared based on their properties and elements respectively.
+        There are no equivalence functions to compare functions other than identity.
+        Therefore a child component must assume a changed identity in a callback prop means memoized values cannot be used.
+      </p>
+      <h2 id="Consequences-of-inconsistency">Consequences of inconsistency</h2>
+      <p>
+        Consider a hypothetical custom select component.
+        It returns some JSX using provided props but it's a heavy chunk of JSX to make it all work.
+        <code>React.memo</code> can memoize it to only rerender when props change.
+        However, memoization becomes useless if just one callback, like an <code>onChange</code> prop, has an inconsistent referential identity.
+      </p>
+      <p>
+        Writing memoization usually involves changing parent components as well to ensure consistent referential identities in props.
+        The parent needs to change because it had made an assumption about the children: that they wouldn't suffer considerable performance costs.
+        When it comes to performance, components are coupled when you fail to ensure consistent referential identities.
+        Sometimes props with inconsistent referential identities originate from far away ancestor components or a context, not just the immediate parents, thus coupling the whole spaghetti together.
+      </p>
+      <h2 id="Not-directly-optimizing">Not directly optimizing</h2>
+      <p>
+        In the past I've had senior developers point out that memoizing one-liner functions is computationally more expensive than regenerating them each time.
+        While well intentioned, the complaint misses the point of a consistent referential identity.
+      </p>
+      <p>
+        Ensuring consistent referential identities is about clean code, not optimizing.
+        It clarifies the prop interface between components; an unchanged callback will have the same identity.
+        Consistent referential identities afford you the flexibility to address optimization issues locally at a component level.
+        Without consistency you'd have to make changes in multiple components to optimize one.
+      </p>
+    </article>
+  </body>
+</html>
