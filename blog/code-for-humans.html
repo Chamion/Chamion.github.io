@@ -19,12 +19,12 @@
       <h1 id="Writing-code-for-humans">Writing code for humans</h1>
       <time datetime="2020-06-20">2020-06-20</time>
       <p>
-        Developers read code on a page from left to right, top to bottom.
+        Developers read code from left to right, top to bottom.
         If your intention is to write a function for humans to read, you should write it as a logical progression from start to end.
       </p>
       <h2 id="Three-parts-of-a-function">Three parts of a function</h2>
       <p>
-        A well-written pure function can usually be divided into three parts.
+        A well-written pure function can be divided into three parts.
       </p>
       <ol>
         <li><strong>Efferent</strong>: Parsing and validating inputs.</li>
@@ -48,9 +48,9 @@ const Currency = props => &lt;span&gt;{props.amount.toFixed(2)}{CURRENCY_SYMBOLS
       </code>
       <p>
         This one-liner is hard to read because it has all three parts jumbled together in no sensible order.
-        The efferent part is forked in two as two property accesses to the props object.
+        The efferent part is forked into two property accesses to the props object.
         The transform part is inlined in the middle, coupled to the efferent parts.
-        The afferent part starts at the opening tag and ends at the closing tag spanning (pun intended) the entire function body.
+        The afferent part spans (pun intended) the entire function body.
       </p>
       <p>
         Let's first extract the efferent part.
@@ -61,16 +61,16 @@ const Currency = ({ amount, currency }) => &lt;span&gt;{amount.toFixed(2)}{CURRE
 </pre>
       </code>
       <p>
-        Alright, now we can at least tell the shape of <code>props</code> at a glance.
+        Now we can at least tell the shape of <code>props</code> at a glance.
       </p>
       <p>
         Up next, extracting the transform part.
       </p>
       <code>
 <pre>
-const Currency = ({ amount, currency }) => { // Efferent
-  const symbol = CURRENCY_SYMBOLS[currency]; // Transform
-  const formattedAmount = amount.toFixed(2); // Transform
+const Currency = ({ amount, currency }) => {     // Efferent
+  const symbol = CURRENCY_SYMBOLS[currency];     // Transform
+  const formattedAmount = amount.toFixed(2);     // Transform
   return &lt;span&gt;{formattedAmount}{symbol}&lt;/span&gt;; // Afferent
 };
 </pre>
@@ -79,7 +79,7 @@ const Currency = ({ amount, currency }) => { // Efferent
         And we're done!
       </p>
       <p>
-        Next time you see out-of-order code you will have the pedantic terms to formalize your discomfort.
+        Next time you review disorderly code you will have the pedantic terms to verbalise your discomfort.
       </p>
     </article>
   </body>
