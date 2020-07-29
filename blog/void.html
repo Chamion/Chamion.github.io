@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - A case for the void operator</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="./index.html">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1 id="A-case-for-the-void-operator">A case for the void operator</h1>
+      <p>
+        I've recently fallen in love with the delightful expressiveness of the JavaScript <code>void</code> operator.
+        If you don't know what the <code>void</code> operator is you can read about it in <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/void">MDN</a> but you don't need to know anything to understand this article.
+      </p>
+      <h2 id="Expressiveness">Expressiveness</h2>
+      <p>
+        Taka a look at the following example usage.
+      </p>
+      <code>
+<pre>
+const handleEvent = event => void sideEffect(event);
+</pre>
+      </code>
+      <p>
+        Even if you've never seen a <code>void</code> operator used in javascript you can likely tell <code>handleEvent</code> always returns <code>undefined</code>.
+      </p>
+      <p>
+        The same code without the void operator would look like this.
+      </p>
+      <code>
+<pre>
+const handleEvent = event => {
+  sideEffect(event);
+};
+</pre>
+      </code>
+      <p>
+        I claim the former is more expressive than the latter.
+      </p>
+      <p>
+        The number of lines has nothing to do with it.
+        We could write a one-liner without the void operator.
+      </p>
+      <code>
+<pre>
+const handleEvent = event => { sideEffect(event); };
+</pre>
+      </code>
+      <p>
+        The reason <code>void</code> is more expressive lies in the specificity of the syntax.
+        <code>void</code> is only ever used for voiding the value of an expression.
+        An arrow function body can be used to void a value but it can also be used to group statements of a function.
+        Voiding a value is the only possible reason a developer would ever use the <code>void</code> operator.
+        It eliminates ambiquity from the code while a function body leaves some in.
+      </p>
+      <h2 id="Maintainability">Maintainability</h2>
+      <p>
+        Expressive code is easier to maintain and less prone to regression.
+        Let's assume our <code>handleEvent</code> example goes through some changes, as code tends to do.
+        It's extended with another function call statement.
+      </p>
+      <code>
+<pre>
+const handleEvent = event => {
+  sideEffect(event);
+  otherSideEffect(event);
+};
+</pre>
+      </code>
+      <p>
+        Let's say <code>otherSideEffect</code> wasn't the greatest feature and soon it's removed again.
+      </p>
+      <code>
+<pre>
+const handleEvent = event => sideEffect(event);
+</pre>
+      </code>
+      <p>
+        Whoops!
+        We've introduced regression.
+        <code>handleEvent</code> now returns the return value of <code>sideEffect</code> instead of <code>undefined</code>.
+        Of course ultimately the developer who made the last change is at fault but I'm scarcely interested in the blame game when we can prevent regression by writing expressive code.
+      </p>
+      <p>
+        Let's say we wrote <code>handleEvent</code> using the <code>void</code> operator instead.
+      </p>
+      <code>
+<pre>
+const handleEvent = event => void (
+  sideEffect(event),
+  otherSideEffect(event)
+);
+</pre>
+      </code>
+      <p>
+        The natural, <strong>unambiguous</strong> way to remove <code>otherSideEffect</code> is to revert back to the original.
+      </p>
+      <code>
+<pre>
+const handleEvent = event => void sideEffect(event);
+</pre>
+      </code>
+      <p>
+        No developer is ever going to mess up that change.
+      </p>
+      <h2 id="Typescript">Typescript</h2>
+      <p>
+        Void return types are susceptible to falling through the cracks of TypeScript's type checking. It's not Typescript's fault.
+        The types <code>void</code> and <code>undefined</code> are commonly used interchangeably and for an arguably good reason.
+        If the value is voided then <code>void</code> is semantically correct.
+        It makes APIs less strict and therefore reduces time spent resolving tiresome type errors.
+        It comes with its price, though, which I already elucidated in the regression example above.
+        The <code>void</code> operator gives us the flexibilty of the <code>void</code> type and the safety of <code>undefined</code>.
+      </p>
+      <h2 id="Abuse">Abuse</h2>
+      <p>
+        I've only covered the <code>void</code> operator in the context of voiding side effect return values.
+        I've done so because that's the only appropriate use of <code>void</code> in source code.
+        In addition to function calls, like the cases I showed in examples, object property mutations are an appropriate use of <code>void</code> as they always have side effects.
+      </p>
+      <p>
+        You may have seen <code>void</code> used in minified code to denote <code>undefined</code> using less characters: <code>void 0</code>.
+        Any case where the expression being voided does not potentially create side effects is only appropriate in transpilers and code golf.
+      </p>
+    </article>
+  </body>
+</html>
