@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - How Redux triggers component updates</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="./index.html">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1 id="How-Redux-triggers-component-updates">How Redux triggers component updates</h1>
+      <time datetime="2020-12-12">2020-12-12</time>
+      <p>
+        Back when hooks were a new addition to React my team found it difficult to migrate certain packages because new versions would conflict with our old code.
+        One of these difficult packages was <code>react-redux</code>.
+        We couldn't utilize <code>useSelector</code> or <code>useDispatch</code> but we didn't want to perpetuate the old patterns of Redux code because we knew we wanted to migrate eventually.
+      </p>
+      <p>
+        My solution was to write our own poor man's implementations of the hooks which we could then replace with the real deal when we make the jump.
+        This task had me looking into the internal workings of Redux and it turned out to be wildly interesting.
+        Redux uses certain quirks of primitive hooks in ways that are eccentric, to put it politely.
+        "Disgusting" was the word I used at the time but later on I've grown to appreciate the tricks used and I think all React developers could learn from it.
+      </p>
+      <h2>
+        The problem with useContext
+      </h2>
+      <p>
+        Pop quiz, when does <code>useContext</code> trigger a component update?
+      </p>
+      <details>
+        <summary>
+          <span class="closed">Reveal answer</span>
+          <span class="open">Hide answer</span>
+        </summary>
+        <p>
+          Whenever the referential identity of the context value changes.
+        </p>
+      </details>
+      <p>
+        Okay, next question. When does <code>useSelector</code> trigger a component update?
+      </p>
+      <details>
+        <summary>
+          <span class="closed">Reveal answer</span>
+          <span class="open">Hide answer</span>
+        </summary>
+        <p>
+          Whenever the selected value changes.
+          Change is defined as not equalling the previous value as defined by an equality function passed as an argument or by default identity equality (<code>===</code>).
+        </p>
+      </details>
+      <p>
+        Putting these two together we face a paradox.
+        <code>useSelector</code> invokes <code>useContext</code> to access the Redux context that provides access to the state.
+        How can the hook use the context that has the whole state in it without triggering updates for every change in that state?
+      </p>
+      <h2 id="The-solution-to-useContext">The solution to useContext</h2>
+      <p>
+        Redux stops the unnecessary updates from <code>useContext</code> by stopping all updates from it.
+        <code>useContext</code> only ever updates when the identity of its value changes.
+        We can mutate the value without causing an update.
+        You're never supposed to mutate state in React.
+        We learned that ten minutes into the Indian tutorial video we learned React from.
+        But when you know React as well as Dan does, you can break the rules.
+      </p>
+      <p>
+        So let's start building our own poor man's Redux for demonstration purposes.
+      </p>
+      <code>
+<pre>
+const ReduxProvider = ({ initialState, reducer, children }) => {
+  const state = useRef(initialState);
+  const getState = useCallback(() => state.current, []);
+
+  const dispatch = useCallback(
+    action => void (state.current = reducer(state, action)),
+    [reducer]
+  );
+
+  const [store] = useState(() => ({
+    getState,
+    dispatch
+  }));
+
+  return (
+    &lt;Context.Provider value={store}>
+      {children}
+    &lt;/Context.Provider>
+  );
+};
+</pre>
+      </code>
+      <h2 id="Subscribers-and-publishers">Subscribers and publishers</h2>
+      <p>
+        What I just wrote down indeed causes no unnecessary rerenders from <code>useContext</code>.
+        Unfortunately it doesn't cause any updates.
+        We'll need to manually stay up-to-date with the context value now that it doesn't trigger updates anymore.
+      </p>
+      <p>
+        We'll need to add some callbacks.
+        Let's add a subscribe callback that allows registering subscribers to the context.
+        Dispatching an action should then publish the changes to all subscribers.
+      </p>
+      <code>
+<pre>
+const ReduxProvider = ({ initialState, reducer, children }) => {
+  const state = useRef(initialState);
+  const getState = useCallback(() => state.current, []);
+
+<span style="background-color: darkgreen; display: inline-block; ">  const subscribers = [];
+  const subscribe = useCallback(subscriber => subscribers.current.push(subscriber));
+  const unsubscribe = useCallback(subscriber => {
+    const index = subscribers.indexOf(subscriber);
+    if (index !== -1) subscribers.splice(index, 1);
+  });</span>
+
+  const dispatch = useCallback(
+    action => void (
+      state.current = reducer(state, action),
+<span style="background-color: darkgreen; display: inline-block; width: 100%;">      subscribers.current.forEach(subscriber => subscriber(state.current))</span>
+    ),
+    [reducer]
+  );
+
+  const [store] = useState(() => ({
+    getState,
+    dispatch,
+<span style="background-color: darkgreen; display: inline-block; width: 100%;">    subscribe,
+    unsubscribe
+</span>
+  }));
+
+  return (
+    &lt;Context.Provider value={store}>
+      {children}
+    &lt;/Context.Provider>
+  );
+};
+</pre>
+      </code>
+      <p>
+        In a subscriber we can conditionally update our selected value as a response to the state changing.
+      </p>
+      <code>
+<pre>
+const useSelector = (selector, equalityFn = refEquals) => {
+  const { getState, subscribe, unsubscribe } = useContext(Context);
+
+  const [selectedValue, setSelectedValue] = useState(() => selector(getState()));
+
+  const subscriber = useCallback(
+    state => {
+      const newValue = selector(getState());
+      setSelectedValue(
+        prevValue => equalityFn(prevValue, newValue) ? prevValue : newValue
+      );
+    },
+    [selector, equalityFn, getState]
+  );
+
+  useEffect(() => (
+    subscribe(subscriber),
+    () => unsubscribe(subscriber)
+  ), [subscribe, unsubscribe, subscriber]);
+
+  return selectedValue;
+};
+
+const refEquals = (a, b) => a === b;
+</pre>
+      </code>
+      <h2 id="Learnings">Learnings</h2>
+      <p>
+        We've written bootleg Redux!
+        It doesn't handle corner cases, it's full of bugs and the API is different from Redux but it does handle the basic use case of selecting state values and dispatching actions.
+        Component's won't rerender needlessly when state changes due to the hacks we performed with mutation.
+      </p>
+      <p>
+        Redux hooks take a brave approach to solving the performance issues of having lots of state in one context.
+        It works because all the weird logic showcased in this post is hidden from the user.
+        A developer using Redux needs not know of all the curios in the background.
+        If you write something similar in your own code make sure you test it vigorously and encapsulate all the weirdness because your coworkers will have words for you if they need to touch any of it.
+      </p>
+      <p>
+        I hope this examination gave you an appreciation for creative ways to improve React app performance.
+        It's not always about <code>useMemo</code> and referential identities.
+      </p>
+    </article>
+  </body>
+</html>
