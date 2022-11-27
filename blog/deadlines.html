@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - A Case Against Deadlines</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="./index.html">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1 id="Anonymous-the-worst-and-most-common-name">A Case Against Deadlines</h1>
+      <time datetime="2022-11-27">2022-11-27</time>
+      <p>
+        A deadline is a point in time before which something must be completed.
+        Missing a deadline is considered a failure and should be avoided by definition.
+        This article describes why deadlines in software development are harmful and entirely unnecessary.
+        This includes formal deadlines for delivering features, informal deadlines like sprint review dates and implicit deadlines like a manager asking whether a task will be done by Thursday.
+      </p>
+      <h2>No Deadline Is Absolute</h2>
+      <p>
+        Every deadline always includes an alternative.
+        Either it's met or else something bad happens.
+        Reasonable deadlines might be caused by outside forces.
+        “Ensure compliance with new law before the audit date or else the company will be fined.”
+        “Migrate to a new API version before the date dictated by a third party or else services will stop working.”
+        Corporate politics might produce less reasonable deadlines.
+        “Deliver these features before end of quarter or else quarterly goals are not met.”
+        “Deliver this feature by Friday or else we won't have anything to demo this sprint.”
+        Spelled out like that the true intent behind setting the deadline is laid clear.
+        Unfortunately this “or else” part is often nebulous, seldom said out loud and left to be inferred.
+      </p>
+      <h2>Effects Of Deadlines</h2>
+      <p>
+        There are two types of deadlines: those that can be met and those that cannot. Both are damaging in different ways.
+      </p>
+      <h3>Reachable Deadlines</h3>
+      <p>
+        If a deadline can be met the delivery time would have been met without it rendering the deadline useless.
+        It's actually worse due to <a href="https://en.wikipedia.org/wiki/Parkinson%27s_law" target="_blank">Parkinson's Law</a>.
+        Work expands to fill the available time.
+        Framing a feature in terms of a delivery date sets expectations for its complexity effectively steering engineers away from simple solutions.
+        Engineers do this to themselves enough with estimates.
+        Let's not compound the problem with deadlines.
+      </p>
+      <h3>Unreachable Deadlines</h3>
+      <p>
+        Deadlines can evoke some maladaptive behaviours in engineers.
+        Usually it's due to engineers avoiding confrontation and trying to be nice.
+        Let's look at some bad engineer responses to unreasonable deadlines and what better alternatives would be.
+      </p>
+      <h4>Optimistic estimates</h4>
+      <p>
+        An unreachable deadline limits the estimates engineers voice.
+        It anchors the estimated timeline and engineers feel foolish if their estimate wildly exceeds the allocated time.
+        It's psychologically more comfortable to offer estimates that fit within the given deadline.
+      </p>
+      <p>
+        A better approach is to itemise the estimate.
+        Engineers can then offer different sets of features that would fit within the deadline.
+        Managers can pick the most important features to be done first.
+        Even if there's disagreement about the overall timeline both parties can agree on where to start.
+      </p>
+      <h4>Labelling Unfinished Work “Done”</h4>
+      <p>
+        Software engineering makes cutting corners difficult.
+        There is no tradeoff between quality and speed after all.
+        In an attempt to meet deadlines engineers might mark unfinished work as done while continuing to work on it.
+        This most commonly happens with demos.
+        An engineer might run a demo in their local environment instead of production because he couldn't get it to work with production data.
+        The product owner sees the “done” feature and engineers scramble to ship it before anyone notices their deception.
+      </p>
+      <p>
+        A better approach would be to just postpone the demo until the feature is actually ready to be shown off.
+        As a rule of thumb if you have to write code, not just test data, specifically for a demo it's not ready.
+        If the demo is shown to a customer rather than an internal product owner, then the demo should be though of as its own task with its own estimated value.
+        Managers should also present it as such.
+        Lying to customers has business value.
+        Lying to your boss does not.
+      </p>
+      <p>
+        Engineers also perform some alchemy with edge cases.
+        An edge case is recognised but handling but no ticket is written for handling it because it would push the estimate over the deadline.
+        It's then later discovered as a bug at a later date involving a much greater amount of work overall.
+        It's best for engineers to be open about technical concerns they have.
+        The clearer they can communicate the better information the managers have to make good choices.
+        Sometimes the concerns are still brushed off.
+        Even then there are tickets to track the missing parts instead of some poor tester having to write up a whole bug report for what engineers already knew.
+      </p>
+      <hr></hr>
+      <p>
+        All of these issues can be avoided if engineers rigorously stay true to their work and suppress their human nature.
+        Alternatively managers could just not set deadlines.
+        Depends on the organisation which is easier.
+      </p>
+      <h2>Team Goals</h2>
+      <p>
+        Team goals, be they Key Results (KR), sprint goals, Key Performance Indicators (KPI) or whatever else management cooks up are not objectives.
+        They are tools of retroactive measurement of performance.
+        Remember <a href="https://en.wikipedia.org/wiki/Goodhart%27s_law" target="_blank">Goodhart's Law</a>: "When a measure becomes a target, it ceases to be a good measure.”
+      </p>
+      <p>
+        Meeting goals should be a side-effect of good work, not its aim.
+        Well-defined goals cannot be met by anything but good work but in practice they are always at least a little game-able. Treating the turn of the quarter or the end of a sprint as a deadline to meet is essentially gaming the metrics.
+      </p>
+      <p>
+        KRs and KPIs always come paired with objectives.
+        The objectives per se can and should guide day to day work.
+        Appealing to objectives is a good way to argue for aligning with company goals and against overengineering.
+        Please let the measure half of these pairs be for review only.
+      </p>
+      <h2>A Better Way: Priorities</h2>
+      <p>
+        Anything deadlines can achieve can be better achieved by maintaining a well-groomed backlog of work items.
+        Well-groomed meaning the priorities of work items are clearly defined and up-to-date, the throughput of the team is predictable within reason and the work items are described in enough detail to be understood.
+        It sounds complicated but it's all work managers and engineers have to do anyway just formatted differently.
+      </p>
+      <p>
+        Work items are prioritised in relation to each other.
+        The priority of a task is their estimated value divided by the estimated work.
+        Product owners and engineers must work together to define priorities because each party only knows one side of the equation.
+        The priorities of backlog items must be regularly updated so engineers can pick up the topmost tasks without asking further questions.
+        Luckily the more often you update the priorities the easier the process is.
+      </p>
+      <p>
+        Estimates are made in agreed units of estimated work, often known as story points.
+        Once features are estimated in standard units stakeholders outside the team can understand how large an ask it would be for the team to prioritise a given feature in the backlog.
+      </p>
+      <p>
+        Work items only need a title level description to be recognisable by stakeholders in the backlog.
+        Combine that with rough estimates and they can be used to construct estimated timelines, commonly known as roadmaps.
+        Stack features on a calendar starting with highest priority.
+        Divide the estimates by team throughput to translate to calendar days.
+        It's so simple an operation you can automate it to generate a live updating roadmap.
+        The roadmap updates as priorities change and so do the estimated delivery dates.
+        As tasks are completed the actual work required replaces the estimated work seamlessly in the model.
+        Estimated delivery dates shift and become more precise as the team works.
+      </p>
+      <p>
+        The model I've described above is not a prescription and I admit there's likely better ways to organise.
+        It's just one system among many that offer better alternatives.
+        The point is deadlines are outclassed in every case by better ways of organising work.
+      </p>
+      <p>
+        Earlier I gave an example of a reasonable deadline in the case of an API deprecation.
+        Although setting a deadline is reasonable at times it's never the best way to express the value of a task.
+        It can be better expressed in terms of priorities.
+        When the deprecation date is far in the future the priority of migrating is low.
+        As the deprecation date approaches the priority rises proportional to the estimated risk of missing the deprecation date.
+        At some point it becomes the highest priority task and development begins.
+      </p>
+      <p>
+        Setting a deadline prevents the estimated delivery dates from slipping past a certain point in time.
+        The true priorities of a team don't change, though.
+        Let's look at two deadlines, one with a catastrophic “or else” and one arbitrary.
+        In the catastrophic case the required tasks naturally rise to top priority so the deadline isn't necessary: only information of the impending calamity is.
+        In the arbitrary case the deadline diverts engineers away from the actual highest priorities.
+        Most deadlines are in a grey area between the two extremes so they divert some engineers to tasks that aren't top priorities while still providing no benefit.
+      </p>
+      <h2>Precision Is Not Accuracy</h2>
+      <p>
+        I've heard a defence of deadlines along the lines of “deadlines make it easier for stakeholders who rely on shipped work to prepare and align their work.”
+        Deadlines give a precise time at which a work is estimated to be finished.
+        That estimate is no more accurate than a fuzzy timeline calculated from story points and throughput all other things equal.
+        Deadlines are often missed so all that precision is for nought and accuracy is what predictability is all about.
+        Predicting a specific date sounds more reliable than predicting a range of weeks but it's all illusory.
+      </p>
+      <p>
+        One might think deadlines preventing priorities from changing would make work more predictable.
+        Only in cases where it doesn't matter much.
+        If a stakeholder absolutely needs work done by a specific time then naturally that's top priority so the team ends up working on exactly the same tasks regardless of deadlines.
+      </p>
+      <h2>In Conclusion</h2>
+      <p>
+        Managers should define priorities to direct engineer work and any deadline can be translated to priorities as a function of the risk posed by not meeting them.
+      </p>
+    </article>
+  </body>
+</html>
