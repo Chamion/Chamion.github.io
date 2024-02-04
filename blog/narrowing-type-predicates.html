@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - Narrowing Type Predicates</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="./index.html">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1 id="Anonymous-the-worst-and-most-common-name">Narrowing Type Predicates</h1>
+      <time datetime="2024-02-04">2024-02-04</time>
+      <p>
+        This aricle explains a methodology for improving the type safety of TypeScript type predicates.
+      </p>
+      <h2>Type Predicates</h2>
+      <p>
+        Type predicates in TS are functions whose return value determines whether a parameter value is of a specified type or not.
+      </p>
+      <code>
+<pre>
+const predicate = (value: A): value is B => value.type === 'B';
+</pre>
+      </code>
+      <p>
+        The type being tested for must always be a subtype of the parameter type: <code>B extends A</code>.
+        The type predicate returns true if the parameter value is of type B and false if it's some other subtype of A.
+      </p>
+      <h2>Motivation</h2>
+      <p>
+        Type predicates are by design not type safe.
+        They allow a developer to discriminate between values based on arbitrary checks whose safety developers must ensure on their own.
+        However, there's another use case for type predicates: abstraction.
+        Often a type predicate is logic that narrows the type of a value, extracted to a function.
+        The checks made in the type predicate narrow the type in such a way it would be type safe if the checks were inlined.
+        In these cases a developer need not necessarily define a type predicate but because type narrowing within a function scope is not propagated to the calling function's scope the function must be defined as a type predicate to maintain type narrowing in the calling function's scope.
+        Developers are faced with two bad choices: define a type-unsafe type predicate or inline type checks every time.
+      </p>
+      <h2>Example Case</h2>
+      <p>
+        The motivation is best explained with an example.
+        Consider the following type predicate.
+      </p>
+      <code>
+<pre>
+type Image = {
+  id: string;
+  type: 'IMAGE';
+  imageUrl: string;
+  size: [number, number];
+}
+
+type Video = {
+  id: string;
+  type: 'VIDEO';
+  thumbnailUrl: string;
+  videoUrl: string;
+  size: [number, number];
+}
+
+type ShortFormVideo = {
+  id: string;
+  type: 'SHORT_FORM_VIDEO';
+  videoUrl: string;
+}
+
+type Media = Image | Video | ShortFormVideo;
+type VideoMedia = Video | ShortFormVideo;
+
+const isVideoMedia = (media: Media): media is VideoMedia => {
+  switch (media.type) {
+    case 'VIDEO':
+    case 'SHORT_FORM_VIDEO':
+      return true;
+    default: 
+      return false;
+  }
+}
+</pre>
+      </code>
+      <p>
+        The type predicate <code>isVideoMedia</code> is a reusable function, handy for discriminating between media objects that define a video and any others.
+        Its use makes code more declarative and readable than inlining the type check everywhere it's needed.
+        However, the type-unsafe nature of a type predicate can cause issues.
+      </p>
+      <p>
+        Let's define a new type of video media:
+      </p>
+      <code>
+<pre>
+type UltraWideVideo = {
+  id: string;
+  type: 'ULTRA_WIDE_VIDEO';
+  thumbnailUrl: string;
+  videoUrl: string;
+  size: [number, number];
+}
+
+type Media = Image | Video | ShortFormVideo | UltraWideVideo;
+type VideoMedia = Video | ShortFormVideo | UltraWideVideo;
+</pre>
+      </code>
+      <p>
+        Notice this change in the types makes the implementation of <code>isVideoMedia</code> no longer correct.
+        It's possible a developer may miss this issue, especially if the definitions of the types and the type predicate are not in the same file.
+        There won't be any errors raised by TS either.
+      </p>
+      <h2>Type Constraints</h2>
+      <p>Let's look at how the type predicate could have been defined as a narrowing type predicate to ensure TS raises an error if the implementation is wrong.</p>
+      <code>
+<pre>
+const isVideoMedia = (media: Media): media is VideoMedia => {
+  switch (media.type) {
+    case 'VIDEO':
+    case 'SHORT_FORM_VIDEO':
+      return (media satisfies VideoMedia, true);
+    default: 
+      return (media satisfies Exclude&lt;Media, VideoMedia&gt;, false);
+  }
+}
+</pre>
+      </code>
+      <p>
+        Each return value expression also includes a voided value constrained by a type.
+        With this implementation, after adding the new media type TS will raise an error because one of the constraints is not met.
+      </p>
+      <h2>Definition</h2>
+      <p>
+        A narrowing type predicate is a type predicate whose every return value is a sequence expression where the first element contains a type constraint on the parameter value and the last element is a boolean literal.
+        The type constraint is the type implied in the return type annotation or its complement depending on the return value.
+      </p>
+      <code>
+<pre>
+const predicate = (value: A): value is B => value.type === 'B'
+  ? (value satisfies B, true)
+  : (value satisfies Exclude&lt;A, B&gt;, false);
+</pre>
+      </code>
+      <p>
+        The syntax is unfortunately verbose but still readable.
+        The type constraints are defined such that at least one of them will be violated unless type narrowing infers exactly the types the type predicate implies.
+        In other words the type unsafe type predicate matches exactly the type safe constraints, making the whole type safe.
+      </p>
+      <p>
+        Any type predicate can be transformed into a narrowing type predicate algorithmically.
+      </p>
+      <ol>
+        <li>
+          Replace each return value that's not a boolean literal with a ternary <code>expression ? true : false</code>
+        </li>
+        <li>
+          Replace each return value <code>true</code> with <code>(value satisfies B, true)</code>
+        </li>
+        <li>
+          Replace each return value <code>false</code> with <code>(value satisfies Exclude&lt;A, B&gt;, false)</code>
+        </li>
+      </ol>
+      <h2>Further Safety With Static Analysis</h2>
+      <p>
+        The obvious flaw with this approach is that changing the return type of a type predicate will involve changing each return statement's type constraint too.
+        When making changes a developer might fail to change the type constraints along with the return type and TS won't raise an error if the return type doesn't match the type constraint.
+        To prevent mistakes like this and to make changing return types easier I wrote the linter rule <a href="https://github.com/Chamion/eslint-plugin-chamion-typescript/blob/master/docs/rules/narrowing-type-predicates.md">chamion-typescript/narrowing-type-predicates</a>.
+        The rule identifies type predicates adhering to the narrowing type predicate pattern and reports any mismatched type constraints.
+        It also automatically updates the type constraints for you if you let it.
+      </p>
+      <p>
+        Combining the lint rule with the narrowing type predicate pattern allows you to write type safe type predicates which isn't possible in TS otherwise.
+      </p>
+      <h2>When Not To Use It</h2>
+      <p>
+        Not all type predicates should be narrowing.
+        Sometimes a type predicate is type unsafe on purpose.
+        Any type check leveraging functionality that isn't type safe in its implementation will have to incorporate an element of "trust me, bro".
+        Narrowing type predicates are meant only for cases where the predicate abstracts some type checks you'd otherwise inline.
+      </p>
+    </article>
+  </body>
+</html>
