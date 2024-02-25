@@ -16,12 +16,12 @@
       </h1>
     </header>
     <article>
-      <h1 id="Anonymous-the-worst-and-most-common-name">Narrowing Type Predicates</h1>
+      <h1 id="Narrowing-Type-Predicates">Narrowing Type Predicates</h1>
       <time datetime="2024-02-04">2024-02-04</time>
       <p>
         This aricle explains a methodology for improving the type safety of TypeScript type predicates.
       </p>
-      <h2>Type Predicates</h2>
+      <h2 id="Type-Predicates">Type Predicates</h2>
       <p>
         Type predicates in TS are functions whose return value determines whether a parameter value is of a specified type or not.
       </p>
@@ -34,7 +34,7 @@ const predicate = (value: A): value is B => value.type === 'B';
         The type being tested for must always be a subtype of the parameter type: <code>B extends A</code>.
         The type predicate returns true if the parameter value is of type B and false if it's some other subtype of A.
       </p>
-      <h2>Motivation</h2>
+      <h2 id="Motivation">Motivation</h2>
       <p>
         Type predicates are by design not type safe.
         They allow a developer to discriminate between values based on arbitrary checks whose safety developers must ensure on their own.
@@ -44,7 +44,7 @@ const predicate = (value: A): value is B => value.type === 'B';
         In these cases a developer need not necessarily define a type predicate but because type narrowing within a function scope is not propagated to the calling function's scope the function must be defined as a type predicate to maintain type narrowing in the calling function's scope.
         Developers are faced with two bad choices: define a type-unsafe type predicate or inline type checks every time.
       </p>
-      <h2>Example Case</h2>
+      <h2 id="Example-Case">Example Case</h2>
       <p>
         The motivation is best explained with an example.
         Consider the following type predicate.
@@ -113,7 +113,7 @@ type VideoMedia = Video | ShortFormVideo | UltraWideVideo;
         It's possible a developer may miss this issue, especially if the definitions of the types and the type predicate are not in the same file.
         There won't be any errors raised by TS either.
       </p>
-      <h2>Type Constraints</h2>
+      <h2 id="Type-Constraints">Type Constraints</h2>
       <p>Let's look at how the type predicate could have been defined as a narrowing type predicate to ensure TS raises an error if the implementation is wrong.</p>
       <code>
 <pre>
@@ -132,7 +132,7 @@ const isVideoMedia = (media: Media): media is VideoMedia => {
         Each return value expression also includes a voided value constrained by a type.
         With this implementation, after adding the new media type TS will raise an error because one of the constraints is not met.
       </p>
-      <h2>Definition</h2>
+      <h2 id="Definition">Definition</h2>
       <p>
         A narrowing type predicate is a type predicate whose every return value is a sequence expression where the first element contains a type constraint on the parameter value and the last element is a boolean literal.
         The type constraint is the type implied in the return type annotation or its complement depending on the return value.
@@ -163,7 +163,7 @@ const predicate = (value: A): value is B => value.type === 'B'
           Replace each return value <code>false</code> with <code>(value satisfies Exclude&lt;A, B&gt;, false)</code>
         </li>
       </ol>
-      <h2>Further Safety With Static Analysis</h2>
+      <h2 id="Further-Safety-With-Static-Analysis">Further Safety With Static Analysis</h2>
       <p>
         The obvious flaw with this approach is that changing the return type of a type predicate will involve changing each return statement's type constraint too.
         When making changes a developer might fail to change the type constraints along with the return type and TS won't raise an error if the return type doesn't match the type constraint.
@@ -174,7 +174,7 @@ const predicate = (value: A): value is B => value.type === 'B'
       <p>
         Combining the lint rule with the narrowing type predicate pattern allows you to write type safe type predicates which isn't possible in TS otherwise.
       </p>
-      <h2>When Not To Use It</h2>
+      <h2 id="When-Not-To-Use-It">When Not To Use It</h2>
       <p>
         Not all type predicates should be narrowing.
         Sometimes a type predicate is type unsafe on purpose.
