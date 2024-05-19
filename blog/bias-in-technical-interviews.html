@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - Bias In Technical Interviews</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="./index.html">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1 id="Bias-In-Technical-Interviews">Bias In Technical Interviews</h1>
+      <time datetime="2024-05-19">2024-05-19</time>
+      <p>
+        Experienced technical interviewers often dispense poor advice, despite
+        being expert engineers. This article explores how interviewers can
+        unintentionally undermine the hiring process while believing they are
+        experts.
+      </p>
+      <p>
+        After an interviewer makes a recommendation he seldom gets feedback on
+        whether it was any good. If a good candidate was rejected the
+        interviewer will likely never meet him again. If a bad candidate was
+        accepted the interviewer might not ever see his work. Compounding the
+        problem, recruiters often have to take the interviewers' recommendations
+        at face value and no other engineers review the quality of
+        recommendations either. Interviewers lack both feedback and
+        accountability. This allows interviewers to make mistakes without ever
+        realising or learning.
+      </p>
+      <p>
+        I explained what the quality of recommendations means in an earlier
+        <a href="./fundamentals-of-interviewing.html">post</a>. A good
+        interviewer passes high quality candidates and rejects low quality
+        candidates.
+      </p>
+      <h2 id="Random-and-Systemic-Bias">Random and Systemic Bias</h2>
+      <p>
+        I make a distinction between two types of bias: random and systemic.
+        Bias overall is factors other than those you wish to select for
+        affecting the interview result. Systemic bias is defined by its effect
+        being predictable from a candidate's characteristics. For example
+        writing the interview question in a different coding language than
+        what's used in work tasks advantages candidates familiar with the
+        language. Random bias is the complement of systemic bias. For example
+        randomly selected interviewers holding different pass criteria
+        advantages candidates lucky enough to get a more lenient interviewer.
+      </p>
+      <p>
+        Both kinds of bias lead to errors in interview and as such are equally
+        damaging in the short term. Systemic bias has the added danger of
+        shaping the employee pool in unintended ways. If these employees also
+        interview, a systemic bias may multiply exponentially over time.
+        Systemic feedback loops are more an interesting thought experiment than
+        real effects because biases can be addressed actively so any damage
+        caused is neither permanent nor inevitable. Systemic biases only
+        compound when an organisation fails to do anything about its biases.
+      </p>
+      <h2 id="Calibration">Calibration</h2>
+      <p>
+        An effective interview should neither pass all candidates nor reject
+        them all. The ideal rejection rate depends on the number of applicants
+        and the hiring needs. More applicants mean a higher rejection rate is
+        necessary, and vice versa.
+      </p>
+      <p>
+        An interview question can be calibrated by running mock interviews on
+        coworkers. Assuming your coworkers are of the quality you'd like to hire
+        they ought to have a good chance of passing the interview. As a rule of
+        thumb any interview question you come up with will be much harder than
+        what you as its author estimate.
+      </p>
+      <p>
+        Once you run an interview question in actual interviews you can gather
+        data and validate the rejection rate is as intended.
+      </p>
+      <h2 id="Diversity-Of-Questions">Diversity Of Questions</h2>
+      <p>
+        If you run a variety of interview questions they will unavoidably be of
+        varying difficulty. Picking a random question will introduce random bias
+        proportional to the standard deviation in difficulties.
+      </p>
+      <p>
+        Picking questions by some criteria other than random will introduce
+        systemic bias proportional to the product of the bias in the selection
+        criteria and the difference in difficulty.
+      </p>
+      <p>
+        You can avoid these problems entirely by only using one interview
+        question. This approach isn't without its flaws. The question may leak
+        and cheaters would prosper. The question might not fit every position
+        you hire for. Unfortunately there is no good counter to this source of
+        bias so careful calibration is required.
+      </p>
+      <h2 id="Quality-Of-Questions">Quality Of Questions</h2>
+      <p>
+        Many interview questions are only tangentially related to work tasks,
+        often focusing on algorithm problems that are rarely encountered on the
+        job. A candidate with desirable traits should have an advantage due to
+        those traits. An advantage or disadvantage due to any other traits is a
+        source of bias.
+      </p>
+      <p>
+        The worst interview question I've ever heard of was one where the
+        interviewer asked a candidate to write Hello World in Java without
+        writing a single semicolon. I was assured this is a true story although
+        I hope it isn't. For the curious, the solution is to include the print
+        call in an expression, in an if-statement's test block for example. This
+        is a terrible interview question because it tests esoteric trivia.
+        Whether a candidate knows of an obscure language quirk has a much weaker
+        correlation to engineering ability than whether they can implement some
+        features in code.
+      </p>
+      <p>
+        Algorithm questions are generally weak although the concept isn't
+        without merit. Algorithm questions are essentially intelligence tests.
+        The intent is that a candidate who is intelligent will have an advantage
+        and since an IQ test would be illegal the algorithm question is the next
+        closest thing. Unfortunately that's where the benefits end and the
+        issues start. Algorithm questions are only tangentially related to real
+        engineering work so they miss out on a lot of information. The worst
+        issue is caused by their ubiquitous use. Because algorithm questions are
+        widely used engineers looking for a job know to practice them. Engineers
+        who keep getting rejected tend to practice more algorithm questions. In
+        practice by running an algorithm question you are advantaging the
+        candidates who have practiced the most over the better engineers who
+        need not practice as they find employment easily. Selecting for
+        candidates who practice the most can inadvertently select for low
+        quality candidates that every other employer has rejected. In conclusion
+        running an algorithm question can systemically bias recommendations
+        towards the opposite of desired outcomes.
+      </p>
+      <p>
+        So what would a good interview question look like? A good question
+        minimises the impact of irrelevant factors and maximises the impact of
+        job-relevant factors. To maximise job-relevancy make the question like
+        the real work challenges. For example if the work heavily involves
+        database operations ask the candidate to write a database migration. Or
+        maybe provide them with the migration and ask them to write tests for
+        it.
+      </p>
+      <p>
+        Once you've picked a work-related challenge to turn into an interview
+        question go through all of its implementation details and abstract all
+        that you don't specifically want to impact results. Write your own
+        database interface for the interview so candidates are not impacted by
+        whether they know a specific technology. Alternatively write versions
+        for many different database implementations so each candidate can use
+        their favourite. Offer the question in multiple languages unless you're
+        specifically looking for experience with a specific language. Inspect
+        every detail of your question. If it introduces bias, abstract it away.
+      </p>
+      <h2 id="Diversity-Of-Interviewers">Diversity Of Interviewers</h2>
+      <p>
+        If there are multiple interviewers their rejection rates may vary. A
+        candidate is obviously advantaged if they get an interviewer who is
+        lenient with their recommendations. The bias introduced is random or
+        systemic depending on the selection criteria.
+      </p>
+      <p>
+        The obvious differences between interviewers are in their pass criteria
+        and how strictly they adhere to them. This can be remedied by providing
+        commonly agreed on pass criteria. Ideally the pass criteria are
+        objective, like whether the candidate solved a coding problem or not.
+      </p>
+      <p>
+        A less obvious source of bias is the interviewer's interaction with
+        candidates. A candidate can be advantaged by an interviewer offering
+        hints. This can be remedied by minimising the use of hints. Ideally the
+        interviewer offers no hints. This may sound extreme. Interviewers like
+        to think themselves experts so they try to interact with the candidate
+        as much as possible. Interviewers must remember the interview is not
+        about them and minimise their role in it. Prefer written instructions
+        and provide interviewers with a script to follow.
+      </p>
+      <h2 id="Expertise-Of-Interviewers">Expertise Of Interviewers</h2>
+      <p>
+        Interviewers ought to be able to answer clarifying questions. Unprepared
+        interviewers can inadvertently disadvantage candidates. Familiarise all
+        interviewers with your interview question so they can offer
+        clarification when needed.
+      </p>
+      <p>
+        Interviewers might also struggle to validate candidates' answers. If an
+        interviewer misses a flaw in a candidate's code they might mistakenly
+        pass them. They might also not understand a candidate's code and think
+        it flawed due only to their own lack of expertise. I've seen
+        interviewers offer factually untrue assessments with great confidence.
+        If you let a terrible architect subjectively judge candidates' code he
+        will prefer the candidates who share his specific bad habits and ideas.
+      </p>
+      <p>
+        You can minimise the impact of interviewers' failings by making the
+        interview easy to run and judge. Provide interviewers with plenty of
+        model answers so they know what to look for and won't be confused by
+        uncommon, yet valid, solutions. Provide an objective scale on which to
+        judge candidate performance. Code solutions can and should be validated
+        automatically. Eliminate any subjective scores like code quality or
+        communication skills.
+      </p>
+      <h2 id="Candidate-Charisma">Candidate Charisma</h2>
+      <p>
+        Interviewers will want to pass candidates they like even when that
+        feeling is caused by unrelated factors. If the interviewer's opinion on
+        the character of the candidate can influence the recommendation all
+        kinds of systemic biases are introduced. There's DEI implications you
+        definitely want to avoid. Interviewers are unfortunately human so they
+        will have a reaction to a strong accent for example. There's also some
+        less obvious random biases. Maybe a candidate wears a band shirt the
+        interviewer happens to like.
+      </p>
+      <p>
+        Limit the impact an interviewer can have on the recommendation they
+        make. Give interviewers clear guidelines on how to run the interview,
+        when to offer hints, what kind of follow-up questions to ask and so on.
+        Explicit instructions help interviewers stick to their script and
+        minimises the impact of any unconscious bias. Conscious bias is
+        different. If your interviewers are actually racist or something I can't
+        help you.
+      </p>
+      <h2 id="Reporting-Format">Reporting Format</h2>
+      <p>
+        How you ask interviewers to present their recommendations matters. If
+        you ask them to rate a candidate's performance on a scale you'll get
+        more ambiguous answers than with a binary pass-fail. If you ask
+        interviewers to back their opinions up with objective observations
+        they're more likely to think in an objective way. On the contrary if you
+        ask interviewers about irrelevant factors those factors will influence
+        the overall recommendation.
+      </p>
+      <p>
+        This is simple to get right. Ask interviewers about the relevant
+        candidate qualities and nothing else. Unfortunately interview report
+        forms often include irrelevant fields that encourage interviewers to
+        bring in their biases. One report form I've had to work with asked
+        interviewers to rate candidates on a handful of attributes like “code
+        quality”, “communication”, “understanding provided code” and finally
+        completion of the task itself. The one attribute that matters, how well
+        the candidate completed the coding tasks, was buried as just one
+        attribute among many despite being the only objective metric and the
+        only one that mattered. All the other fields only served to poison the
+        well with bias.
+      </p>
+      <h2 id="Candidate-Confusion">Candidate Confusion</h2>
+      <p>
+        An interview has no value if the candidate doesn't understand what she
+        is expected to perform. Communication failure can also partially ruin an
+        interview with smaller misunderstandings. Implicit assumptions in
+        instructions can trip up candidates. Good coding challenges explicitly
+        note assumptions like the maximum size of an input. For example a
+        candidate who doesn't know an input is expected to be non-negative might
+        spend time thinking about handling negative numbers. Often assumptions
+        are omitted deliberately because candidates asking clarifying questions
+        is part of the test. In such cases have the answers ready and well
+        defined.
+      </p>
+      <p>
+        In one coding challenge I wrote candidates were allowed to assume an API
+        call would always succeed. That's not how the network works in real life
+        but in this case the assumption allowed candidates to skip to the
+        interesting part. Unfortunately I neglected to communicate this to
+        candidates so the brightest candidates would spend time thinking about
+        error handling and interviewers had to step in to explicate the
+        assumption. The confusion wasn't part of the test and biased the
+        interview against the best candidates.
+      </p>
+      <p>
+        Confusion surrounding the interview task itself like the above example
+        is easy enough to address with better instructions. The other kind of
+        confusion is around performance expectations. If a candidate doesn't
+        know what you're looking for they have to guess. If the one criterion
+        you're looking for is code that passes a set of tests, communicate this
+        to candidates. Tell them not to worry about code style or impressing the
+        interviewer with design patterns. Likewise if time and space complexity
+        are criteria tell candidates more efficient solutions are preferred.
+      </p>
+      <p>
+        There's a whole industry of interview preparation help. Most of it is
+        coaching candidates on how to divine what interviewers are really
+        looking for when they ask questions. Candidates shouldn't need to do
+        that. If interview prep helps to pass your interview it's biased in
+        favour of candidates who have done said prep instead of improving as an
+        engineer.
+      </p>
+      <p>
+        Take-home tasks often involve a lot of confusion. Candidates can't know
+        what criteria you're looking for. They will wonder if you're somehow
+        keeping track of how much time they spend, whether you prefer a certain
+        coding style or whether they should keep their solution minimal or try
+        to impress you with design patterns. They also have no way of asking for
+        clarification when you inevitably fail to communicate something.
+      </p>
+      <p>
+        Eliminating candidate confusion is one of the main functions of the
+        interviewer. I've established the interviewer's role should be minimal
+        but they can't be entirely replaced by automation. Interviewers must be
+        ready to answer clarifying questions and candidates must know they are
+        free to ask such questions. Some candidates find written instructions
+        easier while others prefer a verbal explanation. Unless you deliberately
+        wish to select for one kind or the other, provide both.
+      </p>
+      <h2 id="In-Practice">In Practice</h2>
+      <p>
+        Eliminating bias entirely is impossible so the aim is to minimise it
+        instead. Both interviewers and those designing the interviews share this
+        responsibility. Address problems in the design of your interviews to
+        eliminate known sources of bias. Focusing on the design is much more
+        efficient than trying to make interviewers better.
+      </p>
+      <p>
+        The damage caused by bias is inversely proportional to the strength of
+        the signal you receive based on characteristics you wish to select for.
+        This observation can be used to justify a change in interview design.
+        Does the proposed change proportionally reduce bias more than it reduces
+        the signal? Remember to ponder this question to avoid deleting what
+        works in an interview while sanding off its biased edges.
+      </p>
+    </article>
+  </body>
+</html>
