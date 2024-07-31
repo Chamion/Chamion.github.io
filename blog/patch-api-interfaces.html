@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - Patch API Interfaces</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="./index.html">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1>Patch API Interfaces</h1>
+      <time datetime="2024-07-30">2024-07-30</time>
+      <p>
+        Web developers have come up with no satisfying standard to settle what a
+        PATCH request payload should look like. Should it match the shape of the
+        resource being modified or should it be a list of operations to apply?
+        There is no one satisfying answer. This article describes the problems
+        in common PATCH API designs, their alternatives and the tradeoffs that
+        apply to the viable ones.
+      </p>
+      <h2>Shallow Object Merge</h2>
+      <p>
+        The most common modern PATCH API design is a JSON shallow object merge.
+        It mirrors the JavaScript spread operator:
+      </p>
+      <code>
+        <pre>
+{
+  ...resource,
+  ...payload
+}
+</pre
+        >
+      </code>
+      <p>
+        It's intuitive to understand, even by developers unfamiliar with JS.
+        Each property in the root of the patch object represents an overwrite
+        operation on that property. The shape of the payload mirrors the shape
+        of the resource being modified, often allowing developers to reuse
+        validation logic from create endpoints.
+      </p>
+      <p>
+        So, what's wrong with it? Earlier I specified properties on the
+        <strong>root</strong>
+        level, because nested object properties overwrite the whole property,
+        not just individual sub-properties. This can defeat the purpose of a
+        patch operation in some cases. If we wish to change the 8:00 event in
+        the following resource, what payload should we send?
+      </p>
+      <code>
+        <pre>
+{
+  "id": "schedule-id",
+  "organizer": "organizer-id",
+  "events": {
+    "8:00": null,
+    "10:00": "event-id-1",
+    "12:00": "event-id-2"
+  }
+}
+</pre
+        >
+      </code>
+      <p>In a shallow merge design it would have to be</p>
+      <code>
+        <pre>
+{
+  "events": {
+    "8:00": "event-id-new",
+    "10:00": "event-id-1",
+    "12:00": "event-id-2"
+  }
+}
+</pre
+        >
+      </code>
+      <p>
+        That's bad for two reasons. For one, the sender of the request must know
+        the current value of events in order to update it. In some cases that
+        might involve requesting the schedule resource just to patch it. Even
+        when doing so, the delay between reading the value and applying the
+        patch introduces race condition bugs. For example if someone had changed
+        the 10:00 event during that time, their change would be unexpectedly
+        reverted by ours.
+      </p>
+      <h2>Alternatives</h2>
+      <p>
+        Seeing the above counter-example you likely reacted with some variation
+        of "couldn't we just…". Unfortunately, it's all tradeoffs from here on.
+        Let's look at some commonly proposed alternatives.
+      </p>
+      <h3>Flatten It All</h3>
+      <p>
+        If we flatten the schedule object, then we don't have a nested object
+        anymore.
+      </p>
+      <code>
+        <pre>
+{
+  "id": "schedule-id",
+  "organizer": "organizer-id",
+  "events.8:00": null,
+  "events.10:00": "event-id-1",
+  "events.12:00": "event-id-2"
+}
+</pre
+        >
+      </code>
+      <p>
+        Now the payload shape no longer matches the resource shape so we've lost
+        some style points. More worryingly, a flattened object suffers from the
+        same problems as…
+      </p>
+
+      <h3>Deep Object Merge</h3>
+
+      <p>
+        If the whole issue with shallow object merge was that its nested levels
+        act differently than its root level, why not eliminate that discrepancy?
+        Let's imagine another property on the schedule resource; a budget. A
+        budget can be one of two shapes:
+      </p>
+      <code>
+        <pre>
+{
+  "type": "MAXIMUM",
+  "value": [Int]
+}
+
+{
+  "type": "TARGET",
+  "value": [Int]
+}
+</pre
+        >
+      </code>
+      <p>
+        In such a case, the following patch will always result in a valid
+        budget.
+      </p>
+      <code>
+        <pre>
+{
+  "budget": { "value": 2000 }
+}
+</pre
+        >
+      </code>
+      <p>
+        However, APIs evolve. Let's say we want to introduce a new type of
+        budget:
+      </p>
+      <code>
+        <pre>
+{
+  "type": "UNLIMITED"
+}
+</pre
+        >
+      </code>
+      <p>
+        No value property, huh? The previously safe patch is now possibly
+        invalid, meaning adding this new union member to a property's validation
+        is a breaking change whereas it wouldn't in a shallow object merge
+        design.
+      </p>
+      <p>
+        Consider also how one would set an unlimited budget. Which of the
+        following budget properties is correct?
+      </p>
+      <code>
+        <pre>
+{
+  "type": "UNLIMITED"
+}
+
+{
+  "type": "UNLIMITED",
+  "value": null
+}
+</pre
+        >
+      </code>
+      <p>
+        I would say technically neither. This might be resolvable in a toy
+        example but in the real world I've worked with unions of half a dozen
+        types and partially overlapping properties. Deep object merge wrecks
+        maintainability.
+      </p>
+      <h3>Series Of Operations</h3>
+      <p>
+        If either kind of object merge leads to trouble, maybe we can give up
+        trying to mirror the shape of the resource in the payload and instead
+        have the payload describe the changes to the resource.
+      </p>
+      <p>
+        There have been attempts to standardise patch operations to cover all
+        cases for everybody. Most notable of these attempts is
+        <a href="https://jsonpatch.com/" target="_blank">JSON Patch</a>. A JSON
+        Patch request is a list of standardised operations to be applied to the
+        resource in order and atomically. The complexity, compared to a shallow
+        object merge is incomparable.
+      </p>
+      <p>
+        Would you be willing to fundamentally change the shape of your request
+        payload to accommodate some problem case like the events property above?
+        You'd have to rewrite <strong>all</strong> of your requests, not just
+        the problematic ones. Besides, it doesn't even support array operations.
+      </p>
+      <h3>Array Operations</h3>
+      <p>
+        Arrays are the worst when it comes to PATCH APIs. Even something as
+        simple as appending an element breaks down in all of the above mentioned
+        designs. There are dozens of array operations one might want to apply in
+        a patch: append, remove if present, add if not present, move, sort,
+        filter, map… Clearly, there are too many to standardise or to implement
+        realistically.
+      </p>
+      <h3>My Solution</h3>
+      <p>
+        Here's some practical advice. Given the shallow object merge has so many
+        desirable qualities and only breaks down in a minority of cases I'd like
+        to start with it as a base. Later extending it with a mechanism to
+        evolve the API design when shallow object merge is found wanting.
+      </p>
+      <p>
+        In my model each property of the payload can either be an overwriting
+        value (like in shallow object merge) or an operation description, which
+        is interpreted and applied.
+      </p>
+      <code>
+        <pre>
+{
+  "budget": {
+    "type": "MAXIMUM",
+    "value": 2000
+  },
+  "events": {
+    "op": "merge",
+    "value": {
+      "8:00": "event-id-new"
+    }
+  }
+}
+</pre
+        >
+      </code>
+      <p>
+        The events property is not overwritten but instead a merge operation is
+        applied to it, shallow merging the value in the operation description
+        into the property value.
+      </p>
+      <p>
+        Operations have to be predefined as available on a property and their
+        implementation has to be defined by the API provider, although I suggest
+        you keep some common conventions in your organisation.
+      </p>
+      <p>
+        The point is to keep things evolvable. Don't define operations until you
+        need them and only use them when needed. This ensures you can make
+        changes to your API in a backwards compatible way. Changing patch
+        strategies altogether is usually a breaking change but in this model
+        adding a merge operation on events is entirely backwards compatible.
+        Consumers of the API uninterested in the events property need not adapt.
+      </p>
+      <p>
+        I'm not trying to start a standard here. I just think this is a neat
+        pattern for when provider and consumer of a patch API are independently
+        developed and backwards compatibility is key. You should consider it as
+        a possible solution when shallow object merge isn't enough.
+      </p>
+      <h2>What If We Didn't Nest?</h2>
+      <p>
+        You may have felt throughout reading this article that the root problem
+        isn't with patches or shallow object merge but instead with nested
+        objects in resources. An event timestamp isn't a property of the
+        schedule, but a relationship between the schedule and event. Give it its
+        own resource type!
+      </p>
+      <p>
+        I think nested objects have their place. They simplify validation rules
+        as all cohesive properties are colocated. They avoid chicken-egg
+        problems like a parent being invalid without any children but children
+        requiring a parent to be created. Often the alternative to nested
+        objects is a sparse data structure where many fields appear to be
+        optional but are actually only used in a subset of resource types. I'd
+        rather deal with occasional patch problems than deal with sparse data
+        structures.
+      </p>
+      <p>
+        If you're unconvinced by my above arguments, let me present my ultimate
+        trump-card as to why these patterns matter. Someone else already wrote
+        an API with nested objects and now you have to maintain it.
+      </p>
+      <h2>Not Just Web APIs</h2>
+      <p>
+        I've presented the problems and solutions in terms of JSON payloads in
+        an HTTP PATCH endpoint. However, the concepts discussed in this article
+        generalise to any kind of patch API and any format that models similar
+        objects. Whether you're using XML, YAML or even a basic struct, the same
+        concepts apply.
+      </p>
+      <p>
+        Don't limit your thinking to APIs exposed over the internet. Similar
+        patterns can occur between objects in your code structure. Reducers
+        apply patch operations dispatched to them, some allow arbitrary
+        functions, others only a shallow object merge. You'll see these patterns
+        everywhere now.
+      </p>
+    </article>
+  </body>
+</html>
