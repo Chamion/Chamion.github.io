@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - Parameter Types</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="./index.html">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1 id="Parameter-Names">Parameter Types</h1>
+      <time datetime="2024-08-29">2024-08-29</time>
+      <p>
+        Should a parameter type constrain the parameter to what one expects to
+        be passed into the method or what the method needs from the parameter?
+        I've had the same debate with multiple software engineers. This article
+        settles the debate and explores the history that explains its existence.
+      </p>
+      <h2>It depends</h2>
+      <p>
+        There are two types of type systems: nominal and structural. A nominal
+        type system requires each interface be explicitly declared and for
+        parameter types to include these same interfaces. Structural type
+        systems use duck typing. As long as a parameter's type matches all the
+        characteristics of an interface it's allowed.
+      </p>
+      <p>
+        No burying the lead; in a nominal type system constrain to what you
+        expect, in a structural type system constrain to what the method needs.
+        If you're writing Java, define descriptively named interfaces and refer
+        to them in method definitions. If you're writing TypeScript, define the
+        broadest possible interface in each method definition.
+      </p>
+      <p>
+        You never hear Java developers argue over the matter. That's because
+        they have no choice. They have to write explicit interfaces and keep
+        referring to them. There is nothing, short of good sense, stopping a
+        TypeScript developer mimicking that style of interface definition in
+        their code. Programmers in structural type systems have a choice and
+        writing maximally broad interfaces results in more maintainable code.
+      </p>
+      <h2>Nominal Types Lead To Unnecessary Constraints</h2>
+      <p>
+        Explicit interfaces force developers into implementing interface
+        segregation. Interfaces are defined client-first and a method definition
+        refers to these interfaces. This means there's a two-way relationship
+        between the provider and consumers of functionality. If a change to an
+        interface makes it incompatible with a method the compiler reports an
+        error. That's preferred. If we wish to add a new usage of a method that
+        new interface has to be added to the method definition. That sucks. A
+        method definition is dependent on its usages. Code changes happen in two
+        places for one reason.
+      </p>
+      <p>
+        It gets worse. If a usage of a method is removed, there is no
+        requirement the method definition be amended to reflect that. This means
+        a method might be constrained by an interface that is never present at
+        run-time. Over time code changes make the codebase harder to change,
+        less maintainable. If you're a Java developer you might be thinking of a
+        specific codebase right now.
+      </p>
+      <h2>Structural Types Allow For Maintainability</h2>
+      <p>
+        Structural types allow a parameter type to be maximally broad. This
+        means any usage that technically works is allowed by the type system. If
+        a new usage is added or removed, the method definition remains
+        unchanged.
+      </p>
+      <code>
+        <pre>
+getDisplayNameStrict(user: User) {
+  return user.name ?? user.id;
+}
+
+getDisplayNameBroad(user: { name?: string; id: string }) {
+  return user.name ?? user.id;
+}</pre
+        >
+      </code>
+      <p>
+        The latter method can be called by any consumer whose use-case is
+        compatible. Most likely that's going to be only two: your intended
+        target use-case and your tests. But if more are introduced, you can
+        re-use the code. It's easier to notice when two or more implementations
+        are similar enough to extract into a shared utility.
+      </p>
+      <p>
+        Defining needless properties on parameter types is already annoying when
+        testing. In the above strict example you'd probably write a user factory
+        to define the irrelevant fields for your test. In the broad example you
+        just pass an object expression.
+      </p>
+      <p>
+        In the larger scale unnecessary properties become a spreading problem.
+        Any consumer of the function will require all the extra properties. If
+        they come from parameters then the consumer of that consumer must
+        provide the parameters and so on recursively throughout the codebase.
+        This can lead to parameters being passed at run-time just because an
+        interface deep down the stack trace requires it in types only. In an
+        aged codebase one might have entire columns in the database that are
+        never used anywhere, just because the type interface has it such that
+        any method referring to the interface also requires it.
+      </p>
+      <p>
+        When parameter types are consistently as broad as possible any
+        constraints in a method are only the union of all the requirements of
+        the methods it calls and the requirements of the function body itself.
+        This means it's a lot easier to try a refactoring and see if the new
+        code is valid. No need to change types in multiple levels of method
+        calls to make your new version fit. Multiple methods having to change
+        for the sake of one method's change should already clue you in that
+        there's a code quality problem.
+      </p>
+      <h2>How Did We Get Here?</h2>
+      <p>
+        Programmers used to a nominal type system are drawn to defining
+        descriptively named interfaces and referring to them in method calls
+        even in a structural type system. Educational material and thought
+        leaders in the past have largely defaulted to nominal type system
+        languages, often Java. The lessons programmers hear regarding code
+        quality often assumes nominal types so advice that is sound in a nominal
+        type setting is given as generic, applying everywhere.
+      </p>
+      <p>
+        There's also a weird bias in the programming community's meme pool where
+        strict type systems, often nominal, are seen as more professional than
+        incomplete type systems like TypeScript or PHP. Programmers who make
+        code decisions by vibing often prefer code that looks more like Java or
+        C# even in contexts where it doesn't apply, like TypeScript or Python.
+      </p>
+      <h2>Remember To Refactor</h2>
+      <p>
+        Practically speaking it's uncomfortable to write a method without
+        defining its parameter type first and I wouldn't advise you do it.
+        Instead, annotate your parameter with the type you expect, write the
+        implementation and then return to pare the parameter type free of any
+        unnecessary properties. This way you get IDE support for your parameter:
+        lists of available properties, autocomplete, links to definitions, AI
+        assist.
+      </p>
+      <p>
+        When you submit production code it should be a finished product. I don't
+        mean functionally, but in terms of its developmental qualities it should
+        be optimised for reading rather than writing. Take some care to prepare
+        the presentation of your method with the reader in mind. The convenient
+        available interfaces are there to help you but your software design
+        decisions shouldn't be based on the autocomplete functionality in your
+        IDE.
+      </p>
+    </article>
+  </body>
+</html>
