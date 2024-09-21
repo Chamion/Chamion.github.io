@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@Chamion personal blog - Engineer-Designer Collaboration</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./blog.css" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="./index.html">
+          <span class="username">@Chamion</span>
+          <span> personal blog</span>
+        </a>
+      </h1>
+    </header>
+    <article>
+      <h1 id="Engineer-Designer-Collaboration">
+        Engineer-Designer Collaboration
+      </h1>
+      <time datetime="2024-09-21">2024-09-21</time>
+      <p>
+        The typical user story in a software team involves contributions from
+        multiple disciplines: product owners, engineers and designers. This
+        article explores inefficiencies found in the hand-offs of work between
+        software engineers and product designers, how these anti-patterns emerge
+        and what to do about them.
+      </p>
+      <h2 id="Business-as-Usual">Business as Usual</h2>
+      <p>
+        Let's examine the usual lifecycle of a user story through an example. I
+        will keep referring back to the example to give a practical illustration
+        of concepts throughout.
+      </p>
+      <p>
+        I'll use a particularly pathological story of engineer-design mismatch
+        from my own experience. The team was tasked with creating a view where
+        first-time users of the app can set up all the required settings before
+        using the app. At the time they had to navigate around to multiple views
+        in the app. Authorising the app to use their social media account,
+        designating a payment method, inviting collaborators; stuff like that.
+      </p>
+      <ol>
+        <li>
+          Discovery - Determine which settings should be included in the
+          onboarding view and whether they are required or optional. Performed
+          by product managers and engineers.
+        </li>
+        <li>
+          Design - Determine how the user sets their settings. Decide on a
+          layout for the view. Define the look of all the elements involved and
+          which links lead where. Performed by designers.
+        </li>
+        <li>
+          Technical Planning - Determine what data must be fetched and from
+          where for the view. Define required API endpoints and which components
+          in the view use them. Determine how the solution will be validated and
+          what done means. Performed by engineers.
+        </li>
+        <li>
+          Implementation - Write the code, validate the solution and deploy it.
+          Performed by engineers.
+        </li>
+      </ol>
+      <p>
+        Obviously this model only applies if some product design is involved in
+        the user story. For the purposes of this article I'll assume there's
+        design involved. None of the discussion is relevant to stories that
+        require no design.
+      </p>
+      <h2 id="A-Picture-of-the-UI">A Picture of the UI</h2>
+      <p>
+        A design artefact, the document designers hand to engineers to guide
+        frontend work, is often practically a screenshot of the intended UI. It
+        shows the layout of elements and how components should be styled. As a
+        design it still lacks a lot of elements.
+      </p>
+      <p>
+        A frontend engineer will have to define what happens when a server
+        request fails or how a component looks while it's still loading required
+        data. Frontend engineers need to make a lot of decisions on which design
+        artefacts seldom include guidance: tooltip copywriting, hover styles,
+        animations, content overflow, context menu, scrollbars, error messages.
+      </p>
+      <p>
+        In our example, the design was a wizard form; each step had to be
+        submitted before the next could be accessed. It featured many new form
+        control components and for each an initial and a value-filled state.
+        That was two out of seven that I needed. Available options and already
+        set values had to be loaded. loading either can fail, resulting in six
+        combinations of loading, error or success pairs.
+      </p>
+      <p>
+        Also, the wizard structure struck me as odd since only one of the
+        settings was required to define another. All the other settings could be
+        done in any order. The design was placing unnecessary restrictions on
+        what users could do.
+      </p>
+      <p>
+        It's not that designers are sloppy or neglect to include necessary
+        detail. A designer seldom has access to information such as which data
+        is available at which state of the UI. They can't know if a
+        &lt;select&gt; element's options are always available, loaded after page
+        load or only loaded when a search query is entered.
+      </p>
+      <h2 id="Lets-Collaborate">Let's Collaborate</h2>
+      <p>
+        Engineers following a design artefact will have to make crucial design
+        choices such as the ones listed above. Often designers have a better
+        grasp of user behaviour and would be better equipped to make these
+        decisions. Instead, engineers make the choices because tasks are done
+        out-of-order.
+      </p>
+      <p>
+        In our example, engineers ended up defining the missing states.
+        Unsurprisingly, we didn't pick the same behaviours for analogous states
+        or even consistent colours for our error icons. We had to go back and
+        redo work to align the designs.
+      </p>
+      <p>
+        So should we swap design and planning in the timeline? Not quite. Design
+        decisions affect plans. It's often useful for an engineer to know what
+        the layouts look like. For example the division of steps in a form flow
+        helps engineers plan which data is useful to prefetch.
+      </p>
+      <p>
+        In our example, had I done the technical planning before seeing the
+        design, I'd have written plans for a dashboard with links to the various
+        parts of the app where the settings could be defined. My design had
+        nothing in common with what designers were thinking.
+      </p>
+      <p>
+        Neither side is equipped to make design decisions alone. The obvious
+        solution is to collaborate on design decisions. Engineers and designers
+        need a shared language they can use to refer to concepts using words
+        that both sides understand to mean the same thing. Luckily such a
+        language already exists.
+      </p>
+      <h2 id="Components">Components</h2>
+      <p>
+        Design systems are libraries of reusable components. Each component has
+        predefined behaviour and styles. When a designer includes a component in
+        a design, engineers know they should use the component from the design
+        system, which comes with all the states and transitions already defined.
+        This is the optimal outcome.
+      </p>
+      <p>
+        We can extend the concept of a component outside any design system. The
+        form controls in our example are recognisable as components. As an
+        engineer seeing them in the design I knew what questions I needed
+        answers to, but it was too late for the designers to incorporate their
+        answers into the design. They had already made decisions relying on
+        assumptions that wouldn't hold in reality. In essence we want to define
+        the components in a design as early as possible because both sides can
+        meaningfully communicate facts about components and understand the other
+        side.
+      </p>
+      <p>
+        I propose engineers and designers should get together to define the
+        components in a view at their most basic level. Gather around a
+        whiteboard and draw boxes to define the desired views and components
+        within them. At this level there is no point in getting any more
+        detailed than when both sides agree on each box's name. I call this
+        process “preliminary planning” just to have a word for it.
+      </p>
+      <h2 id="Revised-Model">Revised Model</h2>
+      <p>Here's concretely the lifecycle model I prefer.</p>
+      <ol>
+        <li>Discovery</li>
+        <li>
+          Preliminary Design - Debate design decisions such as wizard form vs. a
+          single-view wizard vs. link dashboard. Define what the parts of the
+          user interface are. Define the intended user journeys. Enumerate and
+          write down the components. Performed by designers and engineers.
+        </li>
+        <li>
+          Technical Planning - Same as before but the plans must include a list
+          of states for the components that designers can reference. Performed
+          by engineers.
+        </li>
+        <li>
+          Detailed Design - Define the look of all the possible states
+          enumerated in the technical plans. Performed by designers.
+        </li>
+        <li>Implementation</li>
+      </ol>
+      <p>
+        In a nutshell split the design step in two: first the phase where
+        engineers need to be involved and later the part where designers are
+        already provided with sufficient information.
+      </p>
+      <p>
+        Involving engineers in the preliminary design and requiring them to
+        communicate the states explicitly sounds like extra work. However, this
+        is work that engineers end up doing ad-hoc in the existing model anyway.
+        Collaborating early and communicating effectively reduces the need for
+        revisions in designs.
+      </p>
+      <p>
+        Discovery work makes for an apt analogy. Some ticket boards don't have a
+        discovery column. User stories go straight to design and then to
+        technical planning. In such cases engineers end up doing the discovery
+        work anyway, but now they have to fit their new findings onto designs
+        and plans that were both made on faulty assumptions. Likewise, designers
+        end up doing multiple revisions because the information they needed is
+        revealed to them too late.
+      </p>
+      <h2 id="Its-About-Management">It's About Management</h2>
+      <p>
+        Why do we do things the way I described at the start? In short,
+        organisational structure. There is a clear and immediate benefit to the
+        usual structure. A benefit that would be partially lost in my proposed
+        model. Engineers and designers report to different managers. Their work
+        is evaluated separately. When work is segregated, managers can much more
+        effectively evaluate the performance of workers. When work is
+        collaborative, it's more difficult to assign credit for good work.
+        Managers need to identify performance signal from noisy observations.
+      </p>
+      <p>
+        I don't think managers organise this way to make their work easier. The
+        structure is much more likely just a default. Splitting work by team
+        lines and throwing work items over the wall is the structure that
+        naturally emerges if no deliberate planning goes into a structure. Both
+        engineers and design teams communicate much more within teams than
+        across teams. Convey's law would predict the observed structure.
+      </p>
+      <p>
+        There's a reason managers constantly urge workers to communicate across
+        teams and “break silos”. It takes deliberate effort to do anything
+        across team boundaries. If not consciously kept up, a collaborative
+        workflow will degenerate back to throwing work items across a wall. A
+        good way to keep an action conscious is to make it explicit. Add a
+        “preliminary design” column to engineering teams' ticket boards. It
+        explicitly reminds any engineer finishing discovery to reach out to a
+        designer for preliminary design.
+      </p>
+      <p>
+        To transform the collaboration model of your organisation you need
+        buy-in from both engineering and design teams. They need to understand
+        what the new workflow is and agree to execute it. This article ought to
+        help with the former and I don't expect better results for less work
+        overall to be a hard sell.
+      </p>
+    </article>
+  </body>
+</html>
