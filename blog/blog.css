@@ -1,6 +1,6 @@
 body {
-  background-color: #332826;
-  color: rgba(255, 255, 255, .87);
+  background-color: #212121;
+  color: #ececec;
   padding: 0 2%;
   margin-bottom: 200px;
 }
@@ -15,11 +15,12 @@ pre > code {
 }
 
 code, pre {
-  background-color: #121212;
+  background-color: #000;
 }
 
 pre {
-  border-radius: 10px;
+  border-radius: 0 10px 10px 0;
+  border-left: 1px solid #ececec;
   padding: 24px;
   white-space: pre;
   overflow-x: auto;
@@ -30,11 +31,11 @@ strong {
 }
 
 h1 {
-  color: rgba(255, 200, 220, .92);
+  color: #ff7eb4;
 }
 
 h2, h3, h4, h5, h6 {
-  color: rgba(255, 200, 220, .92);
+  color: #ff7eb4;
   padding: 0 4px;
 }
 
@@ -59,7 +60,7 @@ a:hover,:focus {
   color: #fff;
 }
 p > a {
-  color: rgba(220, 200, 255, .92);
+  color: rgba(220, 200, 255, .94);
 }
 
 summary {
@@ -87,8 +88,7 @@ details[open] > summary > .open {
 
 time {
   display: block;
-  color: rgba(255, 255, 255, .6);
-  padding: 0 4px;
+  color: #ececec;
   margin-top: -20px;
   margin-bottom: 20px;
 }
@@ -99,12 +99,13 @@ time {
   margin-top: -16px;
   margin-bottom: 24px;
   padding: 0;
+  gap: 8px;
 }
 .tags > li {
-  margin: 0px 4px;
   padding: 4px;
   border-radius: 8px;
-  background-color: #121212;
+  color: #212121;
+  background-color: #ececec;
 }
 
 .list-item-with-heading {
