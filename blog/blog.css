@@ -107,6 +107,15 @@ time {
   background-color: #121212;
 }
 
+.list-item-with-heading {
+  margin-bottom: 8px;
+}
+
+.list-item-with-heading > p {
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
 @media only screen and (min-width: 768px) {
   body {
     padding: 0 25%;
